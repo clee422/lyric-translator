@@ -1,0 +1,85 @@
+footer.playback-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: white;
+    background-color: black;
+    position: fixed;
+    width: 100vw;
+    height: 5.5rem;
+    bottom: 0;
+}
+
+.current-track {
+    display: flex;
+    flex-direction: row;
+    flex: 0 1 auto;
+    width: fit-content;
+    margin-right: auto;
+    justify-self: start;
+}
+
+.current-track > img {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
+    border-radius: 8px;
+}
+
+.current-track-info {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 0.2rem;
+    max-width: 25vw;
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+
+.current-track-name {
+    font-weight: 500;
+    margin-bottom: 0.1rem;
+}
+
+.current-track-artist {
+    font-size: 0.9rem;
+    color: #c0c0c0;
+}
+
+.playback-control-buttons {
+    background-color: black;
+    display: flex;
+    flex: 0 1 auto;
+    width: fit-content;
+    position: absolute;
+    align-items: center;
+    right: 50%;
+    transform: translateX(50%);
+}
+
+.playback-control-buttons > button {
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    cursor: pointer;
+    height: fit-content;
+}
+
+button.playback-control-toggle-play {
+    margin: 0 2rem;
+    /* margin: 0px 32px; */
+}
+
+button.playback-control-toggle-play > svg {
+    font-size: 3.5rem;
+}
+
+.playback-control-buttons > button:active {
+    opacity: 0.7;
+}
+
+button.playback-control-change-track > svg {
+    font-size: 2.5rem;
+}

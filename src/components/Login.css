@@ -1,0 +1,17 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+a.login-button {
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 2rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 16px 40px;
+    border-radius: 24px;
+}

@@ -1,0 +1,50 @@
+.lyrics-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5.5rem;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.lyrics {
+    width: fit-content;
+    height: fit-content;
+    margin-block: 5vh;
+}
+
+.lyric-line {
+    width: fit-content;
+    margin-block: 0.5rem;
+    padding: 0.15rem 0.4rem;
+}
+
+.lyric-line > span {
+    color: white;
+    opacity: 0.4;
+    white-space: pre-line;
+    cursor: pointer;
+}
+
+div.current-line > span {
+    color: white;
+    opacity: 1;
+}
+
+div.lyric-line.current-line > span:hover {
+    opacity: 1;
+}
+
+.lyric-line > span:hover {
+    opacity: 0.8;
+}
+
+.lyric-line:hover {
+    background-color: #2e2e2e;
+    border-radius: 8px;
+}
+
+div.lyrics-unavailable > span {
+    color: white;
+    font-style: italic;
+}
