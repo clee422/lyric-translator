@@ -3,17 +3,23 @@ import {
     PauseCircle,
     SkipNext,
     SkipPrevious,
+    Translate,
 } from "@mui/icons-material";
+import { Switch } from "@mui/material";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({
     currentTrack,
     paused,
     webPlayer,
+    showTranslation,
+    onToggleTranslation,
 }: {
     currentTrack: Spotify.Track | undefined;
     paused: boolean | undefined;
     webPlayer: Spotify.Player | undefined;
+    showTranslation: boolean;
+    onToggleTranslation: any;
 }) {
     return (
         <footer className="playback-control">
@@ -62,6 +68,13 @@ export default function PlaybackControl({
                 >
                     <SkipNext />
                 </button>
+            </div>
+            <div className="toggle-translate">
+                <Translate />
+                <Switch
+                    checked={showTranslation}
+                    onChange={onToggleTranslation}
+                />
             </div>
         </footer>
     );

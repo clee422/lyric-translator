@@ -12,6 +12,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>(-1);
     const [translation, setTranslation] = useState<string[]>();
+    const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [syncedAvailable, setSyncedAvailable] = useState<boolean>();
 
     // Period for playback position updates (in milliseconds)
@@ -206,6 +207,10 @@ export default function WebPlayback({ token }: { token: string }) {
         }
     }
 
+    function handleToggleTranslation() {
+        setShowTranslation((prevShowTranslation) => !prevShowTranslation);
+    }
+
     useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://sdk.scdn.co/spotify-player.js";
@@ -296,11 +301,14 @@ export default function WebPlayback({ token }: { token: string }) {
                 currentLine={lyricLine}
                 onLyricClick={handleLyricClick}
                 translation={translation}
+                showTranslation={showTranslation}
             />
             <PlaybackControl
                 currentTrack={currentTrack}
                 paused={paused}
                 webPlayer={webPlayer}
+                showTranslation={showTranslation}
+                onToggleTranslation={handleToggleTranslation}
             />
         </div>
     );
