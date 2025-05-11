@@ -11,10 +11,12 @@ export default function Lyrics({
     lyrics,
     currentLine,
     onLyricClick,
+    translation,
 }: {
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
+    translation: string[] | undefined;
 }) {
     function renderLyrics() {
         if (!lyrics) {
@@ -35,6 +37,9 @@ export default function Lyrics({
                     key={index}
                     onClick={() => onLyricClick(index)}
                 >
+                    {translation ? (
+                        <span>{`${translation[index]}\n`}</span>
+                    ) : null}
                     <span>{`${line.lyric}\n`}</span>
                 </div>
             );

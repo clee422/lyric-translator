@@ -11,6 +11,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>(-1);
+    const [translation, setTranslation] = useState<string[]>();
     const [syncedAvailable, setSyncedAvailable] = useState<boolean>();
 
     // Period for playback position updates (in milliseconds)
@@ -29,6 +30,7 @@ export default function WebPlayback({ token }: { token: string }) {
         setCurrentTrack(stateCurrentTrack);
         getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
             setTrackLyrics(lyricsJson);
+            translateLyrics(lyricsJson);
         });
     }
 
@@ -125,6 +127,38 @@ export default function WebPlayback({ token }: { token: string }) {
             );
             setSyncedAvailable(false);
         }
+    }
+
+    function translateLyrics(lyricsJson: any): void {
+        if (
+            !lyricsJson ||
+            !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
+        ) {
+            return;
+        }
+        const lyrics: string = lyricsJson.plainLyrics
+            .split("\n")
+            .filter((line: string) => line !== "")
+            .join("\n");
+        fetch("/player/translate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ lyrics: lyrics }),
+        })
+            .then((res) => {
+                if (res.status == StatusCodes.OK) {
+                    res.json().then((json) => setTranslation(json));
+                } else {
+                    console.error(
+                        `Attempted to translate lyrics, response was status ${res.status}`
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error(`Error translating lyrics: ${error}`);
+            });
     }
 
     function updatePosition() {
@@ -261,6 +295,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 lyrics={lyrics}
                 currentLine={lyricLine}
                 onLyricClick={handleLyricClick}
+                translation={translation}
             />
             <PlaybackControl
                 currentTrack={currentTrack}

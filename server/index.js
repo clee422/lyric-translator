@@ -1,7 +1,9 @@
 import express from "express";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { StatusCodes } from "http-status-codes";
+import { URLSearchParams } from "url";
 
 const clientPort = 3000;
 const serverPort = 5000;
@@ -12,6 +14,7 @@ dotenv.config();
 const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 
 const app = express();
+app.use(bodyParser.json());
 
 let accessToken;
 let codeVerifier;
@@ -112,6 +115,40 @@ app.get("/player/lyrics", (req, res) => {
     });
 });
 
+app.post("/player/translate", (req, res) => {
+    const lyrics = req.body.lyrics;
+    if (!lyrics) {
+        res.status(StatusCodes.BAD_REQUEST);
+    } else {
+        const params = new URLSearchParams({
+            q: lyrics,
+            target: "en-CA",
+            format: "text",
+            key: process.env.GOOGLE_TRANSLATE_API_KEY,
+        });
+        fetch(
+            `https://translation.googleapis.com/language/translate/v2?${params.toString()}`,
+            {
+                method: "POST",
+            }
+        )
+            .then((translationRes) => {
+                if (translationRes.status == StatusCodes.OK) {
+                    translationRes.json().then((json) => {
+                        res.json(
+                            json.data.translations[0].translatedText.split("\n")
+                        );
+                    });
+                } else {
+                    res.status(translationRes.status);
+                }
+            })
+            .catch((error) => {
+                console.error(`Error translating lyrics: ${error}`);
+            });
+    }
+});
+
 app.listen(serverPort, () => {
-    console.log(`Listening at http://127.0.0.1:${serverPort}`);
+    console.log(`Server started at http://127.0.0.1:${serverPort}`);
 });
