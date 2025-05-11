@@ -26,6 +26,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 lyric: "Loading lyrics...",
             },
         ]);
+        setTranslation([]);
         setSyncedAvailable(false);
 
         setCurrentTrack(stateCurrentTrack);
