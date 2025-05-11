@@ -39,7 +39,9 @@ export default function Lyrics({
                     key={index}
                     onClick={() => onLyricClick(index)}
                 >
-                    {translation && showTranslation ? (
+                    {translation &&
+                    showTranslation &&
+                    translation[index] !== line.lyric ? (
                         <span>{`${translation[index]}\n`}</span>
                     ) : null}
                     <span>{`${line.lyric}\n`}</span>
