@@ -20,31 +20,29 @@
 }
 
 .lyric-line > span {
-    color: white;
-    opacity: 0.4;
     white-space: pre-line;
+}
+
+.synced-lyric > span {
+    color: #828282;
+}
+
+div.lyric-line.current-line > span,
+.plain-lyric > span {
+    color: white;
+}
+
+div.lyric-line.synced-lyric:hover {
+    background-color: #2e2e2e;
+    border-radius: 8px;
     cursor: pointer;
 }
 
-div.current-line > span {
-    color: white;
-    opacity: 1;
+div.lyric-line.synced-lyric:not(.current-line):hover span {
+    color: #dadada;
 }
 
-div.lyric-line.current-line > span:hover {
-    opacity: 1;
-}
-
-.lyric-line > span:hover {
-    opacity: 0.8;
-}
-
-.lyric-line:hover {
-    background-color: #2e2e2e;
-    border-radius: 8px;
-}
-
-div.lyrics-unavailable > span {
+.lyrics-unavailable > span {
     color: white;
     font-style: italic;
 }

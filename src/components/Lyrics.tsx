@@ -3,7 +3,7 @@ import "./Lyrics.css";
 
 export interface LyricLine {
     // Time in ms
-    timestamp: number;
+    timestamp: number | undefined;
     lyric: string;
 }
 
@@ -13,12 +13,14 @@ export default function Lyrics({
     onLyricClick,
     translation,
     showTranslation,
+    lyricSync,
 }: {
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
     translation: string[] | undefined;
     showTranslation: boolean;
+    lyricSync: boolean | undefined;
 }) {
     function renderLyrics() {
         if (!lyrics) {
@@ -28,26 +30,39 @@ export default function Lyrics({
                 </div>
             );
         }
+        let lyricsElem;
 
-        const lyricsElem = lyrics?.map((line, index) => {
-            const classNames = clsx("lyric-line", {
-                "current-line": index === currentLine,
+        if (!lyricSync) {
+            const classNames = clsx("lyric-line", "plain-lyric");
+            lyricsElem = lyrics.map((line) => {
+                return (
+                    <div className={classNames}>
+                        <span>{`${line.lyric}\n`}</span>
+                    </div>
+                );
             });
-            return (
-                <div
-                    className={classNames}
-                    key={index}
-                    onClick={() => onLyricClick(index)}
-                >
-                    {translation &&
-                    showTranslation &&
-                    translation[index] !== line.lyric ? (
-                        <span>{`${translation[index]}\n`}</span>
-                    ) : null}
-                    <span>{`${line.lyric}\n`}</span>
-                </div>
-            );
-        });
+        } else {
+            lyricsElem = lyrics.map((line, index) => {
+                const classNames = clsx("lyric-line", "synced-lyric", {
+                    "current-line": index === currentLine,
+                });
+                return (
+                    <div
+                        className={classNames}
+                        key={index}
+                        onClick={() => onLyricClick(index)}
+                    >
+                        {translation &&
+                        translation[index] &&
+                        showTranslation &&
+                        translation[index] !== line.lyric ? (
+                            <span>{`${translation[index]}\n`}</span>
+                        ) : null}
+                        <span>{`${line.lyric}\n`}</span>
+                    </div>
+                );
+            });
+        }
 
         return lyricsElem;
     }

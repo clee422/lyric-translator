@@ -13,7 +13,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [lyricLine, setLyricLine] = useState<number>(-1);
     const [translation, setTranslation] = useState<string[]>();
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
-    const [syncedAvailable, setSyncedAvailable] = useState<boolean>();
+    const [lyricSync, setLyricSync] = useState<boolean>();
 
     // Period for playback position updates (in milliseconds)
     const positionPollingRate: number = 200;
@@ -27,7 +27,7 @@ export default function WebPlayback({ token }: { token: string }) {
             },
         ]);
         setTranslation([]);
-        setSyncedAvailable(false);
+        setLyricSync(false);
 
         setCurrentTrack(stateCurrentTrack);
         getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
@@ -73,7 +73,7 @@ export default function WebPlayback({ token }: { token: string }) {
             !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
         ) {
             setLyrics(undefined);
-            setSyncedAvailable(false);
+            setLyricSync(false);
             return;
         }
 
@@ -117,17 +117,16 @@ export default function WebPlayback({ token }: { token: string }) {
                 };
             });
             setLyrics(newLyrics);
-            setSyncedAvailable(true);
+            setLyricSync(true);
         } else if (lyricsJson.plainLyrics) {
             const split: string[] = lyricsJson.plainLyrics.split("\n");
-            split.unshift("[SYNCED LYRICS NOT AVAILABLE FOR THIS SONG]\n");
             setLyrics(
                 split.map((line) => ({
-                    timestamp: 0,
+                    timestamp: undefined,
                     lyric: line,
                 }))
             );
-            setSyncedAvailable(false);
+            setLyricSync(false);
         }
     }
 
@@ -169,9 +168,9 @@ export default function WebPlayback({ token }: { token: string }) {
                 if (!state) {
                     return;
                 }
-                if (!state.paused) {
+                if (!state.paused && lyricSync) {
                     setLyricLine((prevLine) => {
-                        if (lyrics) {
+                        if (lyrics && lyrics[0].timestamp !== undefined) {
                             if (state.position < lyrics[0].timestamp) {
                                 return -1;
                             }
@@ -183,7 +182,10 @@ export default function WebPlayback({ token }: { token: string }) {
 
                             while (l <= r) {
                                 let m = Math.floor((l + r) / 2);
-                                if (state.position < lyrics[m].timestamp) {
+                                if (
+                                    lyrics[m].timestamp !== undefined &&
+                                    state.position < lyrics[m].timestamp
+                                ) {
                                     r = m - 1;
                                 } else {
                                     lyricLineIndex = Math.max(
@@ -203,7 +205,7 @@ export default function WebPlayback({ token }: { token: string }) {
     }
 
     function handleLyricClick(index: number) {
-        if (webPlayer && lyrics) {
+        if (webPlayer && lyrics && lyrics[index].timestamp) {
             webPlayer.seek(lyrics[index].timestamp);
         }
     }
@@ -303,6 +305,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 onLyricClick={handleLyricClick}
                 translation={translation}
                 showTranslation={showTranslation}
+                lyricSync={lyricSync}
             />
             <PlaybackControl
                 currentTrack={currentTrack}
