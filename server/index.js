@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import { StatusCodes } from "http-status-codes";
 
 const clientPort = 3000;
 const serverPort = 5000;
@@ -91,6 +92,23 @@ app.get("/auth/token", (req, res) => {
     );
     res.json({
         access_token: accessToken,
+    });
+});
+
+app.get("/player/lyrics", (req, res) => {
+    const queryParams = req.url.split("?")[1];
+    fetch(`https://lrclib.net/api/get?${queryParams}`, {
+        headers: {
+            "User-Agent": `${process.env.npm_package_name} v${process.env.npm_package_version} ${process.env.PROJECT_REPO_URL}`,
+        },
+    }).then((fetchLyricRes) => {
+        if (fetchLyricRes.status == StatusCodes.OK) {
+            fetchLyricRes
+                .json()
+                .then((json) => res.status(StatusCodes.OK).json(json));
+        } else {
+            res.status(fetchLyricRes.status);
+        }
     });
 });
 

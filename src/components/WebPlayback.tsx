@@ -45,20 +45,18 @@ export default function WebPlayback({ token }: { token: string }) {
         });
 
         try {
-            return fetch(`https://lrclib.net/api/get?${queryParams}`).then(
-                (res) => {
-                    if (res.status == StatusCodes.OK) {
-                        return res.json();
-                    } else if (res.status == StatusCodes.NOT_FOUND) {
-                        return undefined;
-                    } else {
-                        console.error(
-                            `Attempted to fetch lyrics, response was status ${res.status}`
-                        );
-                        return undefined;
-                    }
+            return fetch(`/player/lyrics?${queryParams}`).then((res) => {
+                if (res.status == StatusCodes.OK) {
+                    return res.json();
+                } else if (res.status == StatusCodes.NOT_FOUND) {
+                    return undefined;
+                } else {
+                    console.error(
+                        `Attempted to fetch lyrics, response was status ${res.status}`
+                    );
+                    return undefined;
                 }
-            );
+            });
         } catch (error) {
             console.error(`Error fetching lyrics: ${error}`);
             return undefined;
