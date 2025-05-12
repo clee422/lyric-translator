@@ -136,7 +136,9 @@ app.post("/player/translate", (req, res) => {
                 if (translationRes.status == StatusCodes.OK) {
                     translationRes.json().then((json) => {
                         res.json(
-                            json.data.translations[0].translatedText.split("\n")
+                            json.data.translations[0].translatedText.split(
+                                `\n{&#10;}`
+                            )
                         );
                     });
                 } else {

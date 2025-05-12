@@ -144,10 +144,11 @@ export default function WebPlayback({ token }: { token: string }) {
         ) {
             return;
         }
+        const delimiter = `\n{&#10;}`; // Preserve line break
         const lyrics: string = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "")
-            .join("\n");
+            .join(delimiter);
         fetch("/player/translate", {
             method: "POST",
             headers: {
