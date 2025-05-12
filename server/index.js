@@ -109,8 +109,10 @@ app.get("/player/lyrics", (req, res) => {
             fetchLyricRes
                 .json()
                 .then((json) => res.status(StatusCodes.OK).json(json));
+        } else if (fetchLyricRes.status == StatusCodes.NOT_FOUND) {
+            res.status(StatusCodes.NOT_FOUND).end();
         } else {
-            res.status(fetchLyricRes.status);
+            res.status(fetchLyricRes).end();
         }
     });
 });
@@ -137,7 +139,7 @@ app.post("/player/translate", (req, res) => {
                     translationRes.json().then((json) => {
                         res.json(
                             json.data.translations[0].translatedText.split(
-                                `\n{&#10;}`
+                                `\n&#10;`
                             )
                         );
                     });
