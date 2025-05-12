@@ -10,7 +10,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [lyrics, setLyrics] = useState<LyricLine[]>();
-    const [lyricLine, setLyricLine] = useState<number>(-1);
+    const [lyricLine, setLyricLine] = useState<number>();
     const [translation, setTranslation] = useState<string[]>();
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [lyricSync, setLyricSync] = useState<boolean>();
@@ -28,6 +28,7 @@ export default function WebPlayback({ token }: { token: string }) {
         ]);
         setTranslation([]);
         setLyricSync(false);
+        setLyricLine(undefined);
 
         setCurrentTrack(stateCurrentTrack);
         getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
@@ -78,42 +79,45 @@ export default function WebPlayback({ token }: { token: string }) {
         }
 
         if (lyricsJson.syncedLyrics) {
-            const split: string[] = lyricsJson.syncedLyrics.split("\n");
-            const filtered = split.filter((line) =>
-                /\[\d{2}:\d{2}.\d{2}\] .+/.test(line)
-            );
+            const synced: string[] = lyricsJson.syncedLyrics
+                .split("\n")
+                .filter((line: string) =>
+                    /\[\d{2}:\d{2}.\d{2}\] .+/.test(line)
+                );
 
             // Use plain lyrics to determine linebreak for new verse
-            let plainLyricsIndex = 1;
-            const plainLyricsSplit = lyricsJson.plainLyrics.split("\n");
+            let syncedLyricsIndex = 0;
+            const plainLyricsSplit: string[] =
+                lyricsJson.plainLyrics.split("\n");
 
-            const newLyrics = filtered.map((line) => {
-                const parts = /\[(\d{2}):(\d{2}).(\d{2})\] (.+)/.exec(line);
+            const newLyrics = plainLyricsSplit.map((line) => {
+                if (line === "") {
+                    return {
+                        timestamp: undefined,
+                        lyric: "",
+                    };
+                }
+                const parts = /\[(\d{2}):(\d{2}).(\d{2})\] (.+)/.exec(
+                    synced[syncedLyricsIndex]
+                );
                 if (!parts) {
                     return {
-                        timestamp: 0,
+                        timestamp: undefined,
                         lyric: "Lyrics could not be found",
                     };
                 }
-                // Timestamp in ms
+                // Compute timestamp in ms
                 const timestamp =
                     parseInt(parts[1]) * 60000 +
                     parseInt(parts[2]) * 1000 +
                     parseInt(parts[3]) * 10;
-                let lyric = parts[4];
+                const lyric = parts[4];
 
-                if (
-                    plainLyricsIndex < plainLyricsSplit.length &&
-                    plainLyricsSplit[plainLyricsIndex] === ""
-                ) {
-                    lyric += "\n";
-                    plainLyricsIndex += 1;
-                }
-                plainLyricsIndex += 1;
+                syncedLyricsIndex += 1;
 
                 return {
-                    timestamp: timestamp,
                     lyric: lyric,
+                    timestamp: timestamp,
                 };
             });
             setLyrics(newLyrics);
@@ -126,6 +130,9 @@ export default function WebPlayback({ token }: { token: string }) {
                     lyric: line,
                 }))
             );
+            setLyricSync(false);
+        } else {
+            setLyrics(undefined);
             setLyricSync(false);
         }
     }
@@ -163,45 +170,45 @@ export default function WebPlayback({ token }: { token: string }) {
     }
 
     function updatePosition() {
-        if (!paused) {
-            webPlayer?.getCurrentState().then((state) => {
-                if (!state) {
-                    return;
-                }
-                if (!state.paused && lyricSync) {
-                    setLyricLine((prevLine) => {
-                        if (lyrics && lyrics[0].timestamp !== undefined) {
-                            if (state.position < lyrics[0].timestamp) {
-                                return -1;
-                            }
+        webPlayer?.getCurrentState().then((state) => {
+            if (!state) {
+                return;
+            }
 
-                            // Binary search to find current lyric
-                            let l = 0;
-                            let r = lyrics.length - 1;
-                            let lyricLineIndex = 0;
+            if (lyricSync) {
+                setLyricLine((prevLine) => {
+                    if (lyrics && lyrics[0].timestamp !== undefined) {
+                        if (state.position < lyrics[0].timestamp) {
+                            return undefined;
+                        }
 
-                            while (l <= r) {
-                                let m = Math.floor((l + r) / 2);
-                                if (
-                                    lyrics[m].timestamp !== undefined &&
-                                    state.position < lyrics[m].timestamp
-                                ) {
+                        // Binary search to find current lyric. O(log(n)) time
+                        let l = 0;
+                        let r = lyrics.length - 1;
+                        let lyricLineIndex = 0;
+
+                        while (l <= r) {
+                            let m = Math.floor((l + r) / 2);
+                            if (lyrics[m].timestamp === undefined) {
+                                // If lyrics[m] is a verse break
+                                if (state.position < lyrics[m + 1].timestamp!) {
                                     r = m - 1;
                                 } else {
-                                    lyricLineIndex = Math.max(
-                                        lyricLineIndex,
-                                        m
-                                    );
                                     l = m + 1;
                                 }
+                            } else if (state.position < lyrics[m].timestamp!) {
+                                r = m - 1;
+                            } else {
+                                lyricLineIndex = Math.max(lyricLineIndex, m);
+                                l = m + 1;
                             }
-                            return lyricLineIndex;
                         }
-                        return prevLine;
-                    });
-                }
-            });
-        }
+                        return lyricLineIndex;
+                    }
+                    return prevLine;
+                });
+            }
+        });
     }
 
     function handleLyricClick(index: number) {

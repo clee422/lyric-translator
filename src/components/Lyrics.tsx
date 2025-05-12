@@ -30,41 +30,38 @@ export default function Lyrics({
                 </div>
             );
         }
-        let lyricsElem;
+        let translationIndex = -1;
 
-        if (!lyricSync) {
-            const classNames = clsx("lyric-line", "plain-lyric");
-            lyricsElem = lyrics.map((line) => {
-                return (
-                    <div className={classNames}>
-                        <span>{`${line.lyric}\n`}</span>
-                    </div>
-                );
+        const lyricElements = lyrics.map((line, index) => {
+            const verseBreak: boolean = line.lyric === "";
+            const classNames = clsx("lyric-line", {
+                "verse-break": verseBreak,
+                "plain-lyric": !verseBreak && !lyricSync,
+                "synced-lyric": !verseBreak && lyricSync,
+                "current-line": index === currentLine,
             });
-        } else {
-            lyricsElem = lyrics.map((line, index) => {
-                const classNames = clsx("lyric-line", "synced-lyric", {
-                    "current-line": index === currentLine,
-                });
-                return (
-                    <div
-                        className={classNames}
-                        key={index}
-                        onClick={() => onLyricClick(index)}
-                    >
-                        {translation &&
-                        translation[index] &&
-                        showTranslation &&
-                        translation[index] !== line.lyric ? (
-                            <span>{`${translation[index]}\n`}</span>
-                        ) : null}
-                        <span>{`${line.lyric}\n`}</span>
-                    </div>
-                );
-            });
-        }
+            if (!verseBreak) {
+                translationIndex += 1;
+            }
+            return (
+                <div
+                    key={index}
+                    className={classNames}
+                    onClick={lyricSync ? () => onLyricClick(index) : undefined}
+                >
+                    {showTranslation &&
+                    !verseBreak &&
+                    translation &&
+                    translation[translationIndex] &&
+                    translation[translationIndex] !== line.lyric ? (
+                        <span className="lyric-translation">{`${translation[translationIndex]}\n`}</span>
+                    ) : null}
+                    <span>{`${line.lyric}\n`}</span>
+                </div>
+            );
+        });
 
-        return lyricsElem;
+        return lyricElements;
     }
 
     return (
