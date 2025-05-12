@@ -139,7 +139,7 @@ app.post("/player/translate", (req, res) => {
                     translationRes.json().then((json) => {
                         res.json(
                             json.data.translations[0].translatedText.split(
-                                `\n&#10;\n`
+                                `\n&#10;`
                             )
                         );
                     });
