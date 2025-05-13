@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { StatusCodes } from "http-status-codes";
 import { URLSearchParams } from "url";
+import { TranslationServiceClient } from "@google-cloud/translate";
 
 const clientPort = 3000;
 const serverPort = 5000;
@@ -15,6 +16,8 @@ const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
 
 const app = express();
 app.use(bodyParser.json());
+
+const translationClient = new TranslationServiceClient();
 
 let accessToken;
 let codeVerifier;
@@ -120,35 +123,31 @@ app.get("/player/lyrics", (req, res) => {
 app.post("/player/translate", (req, res) => {
     const lyrics = req.body.lyrics;
     if (!lyrics) {
-        res.status(StatusCodes.BAD_REQUEST);
+        res.status(StatusCodes.BAD_REQUEST).end();
     } else {
-        const params = new URLSearchParams({
-            q: lyrics,
-            target: "en-CA",
-            format: "text",
-            key: process.env.GOOGLE_TRANSLATE_API_KEY,
-        });
-        fetch(
-            `https://translation.googleapis.com/language/translate/v2?${params.toString()}`,
-            {
-                method: "POST",
-            }
-        )
-            .then((translationRes) => {
-                if (translationRes.status == StatusCodes.OK) {
-                    translationRes.json().then((json) => {
-                        res.json(
-                            json.data.translations[0].translatedText.split(
-                                `\n&#10;`
-                            )
-                        );
-                    });
-                } else {
-                    res.status(translationRes.status);
-                }
+        translationClient
+            .translateText({
+                parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
+                contents: lyrics,
+                mimeType: "text/plain",
+                targetLanguageCode: "en",
+            })
+            .then(([translationResponse]) => {
+                const translatedLyrics = translationResponse.translations.map(
+                    (line) => {
+                        return {
+                            translation: line.translatedText,
+                            detectedLanguage: line.detectedLanguageCode,
+                        };
+                    }
+                );
+                res.status(StatusCodes.OK).json({
+                    translatedLyrics: translatedLyrics,
+                });
             })
             .catch((error) => {
                 console.error(`Error translating lyrics: ${error}`);
+                res.status(StatusCodes.BAD_GATEWAY).end();
             });
     }
 });

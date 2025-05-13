@@ -1,11 +1,6 @@
 import { clsx } from "clsx";
+import type { LyricLine, TranslationLine } from "./WebPlayback";
 import "./Lyrics.css";
-
-export interface LyricLine {
-    // Time in ms
-    timestamp: number | undefined;
-    lyric: string;
-}
 
 export default function Lyrics({
     lyrics,
@@ -18,7 +13,7 @@ export default function Lyrics({
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
-    translation: string[] | undefined;
+    translation: TranslationLine[] | undefined;
     showTranslation: boolean;
     lyricSync: boolean | undefined;
 }) {
@@ -53,8 +48,8 @@ export default function Lyrics({
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
-                    translation[translationIndex] !== line.lyric ? (
-                        <span className="lyric-translation">{`${translation[translationIndex]}\n`}</span>
+                    translation[translationIndex].translation !== line.lyric ? (
+                        <span className="lyric-translation">{`${translation[translationIndex].translation}\n`}</span>
                     ) : null}
                     <span>{`${line.lyric}\n`}</span>
                 </div>

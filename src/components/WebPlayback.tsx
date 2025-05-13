@@ -1,9 +1,20 @@
 import { useState, useEffect } from "react";
 import { StatusCodes } from "http-status-codes";
-import type { LyricLine } from "./Lyrics";
 import Lyrics from "./Lyrics";
 import PlaybackControl from "./PlaybackControl";
 import "./WebPlayerback.css";
+
+export interface LyricLine {
+    // Time in ms
+    timestamp: number | undefined;
+    lyric: string;
+}
+
+export interface TranslationLine {
+    translation: string;
+    // ISO 639 language code
+    detectedLanguage: string;
+}
 
 export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
@@ -11,7 +22,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>();
-    const [translation, setTranslation] = useState<string[]>();
+    const [translation, setTranslation] = useState<TranslationLine[]>();
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [lyricSync, setLyricSync] = useState<boolean>();
 
@@ -144,11 +155,9 @@ export default function WebPlayback({ token }: { token: string }) {
         ) {
             return;
         }
-        const delimiter = `\n&#10;`; // Preserve line break
-        const lyrics: string = lyricsJson.plainLyrics
+        const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
-            .filter((line: string) => line !== "")
-            .join(delimiter);
+            .filter((line: string) => line !== "");
         fetch("/player/translate", {
             method: "POST",
             headers: {
@@ -158,7 +167,9 @@ export default function WebPlayback({ token }: { token: string }) {
         })
             .then((res) => {
                 if (res.status == StatusCodes.OK) {
-                    res.json().then((json) => setTranslation(json));
+                    res.json().then((json) =>
+                        setTranslation(json.translatedLyrics)
+                    );
                 } else {
                     console.error(
                         `Attempted to translate lyrics, response was status ${res.status}`
