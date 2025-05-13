@@ -127,7 +127,7 @@ app.post("/player/translate", (req, res) => {
     } else {
         translationClient
             .translateText({
-                parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
+                parent: `projects/${process.env.GOOGLE_PROJECT_ID}/locations/global`,
                 contents: lyrics,
                 mimeType: "text/plain",
                 targetLanguageCode: "en",
