@@ -32,9 +32,11 @@ export default function PlaybackControl({
                     />
                 ) : null}
                 <div className="current-track-info">
-                    <span className="current-track-name">
-                        {currentTrack?.name + "\n"}
-                    </span>
+                    {currentTrack?.name ? (
+                        <span className="current-track-name">
+                            {currentTrack.name + "\n"}
+                        </span>
+                    ) : null}
 
                     <span className="current-track-artist">
                         {currentTrack?.artists
