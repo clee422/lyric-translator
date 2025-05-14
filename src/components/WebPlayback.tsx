@@ -11,7 +11,8 @@ export interface LyricLine {
 }
 
 export interface TranslationLine {
-    translation: string;
+    translatedText: string;
+    romanizedText: string;
     // ISO 639 language code
     detectedLanguage: string;
 }
