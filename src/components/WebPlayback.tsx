@@ -21,6 +21,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
+    const [position, setPosition] = useState<number>(0);
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>();
     const [translation, setTranslation] = useState<TranslationLine[]>();
@@ -188,6 +189,8 @@ export default function WebPlayback({ token }: { token: string }) {
                 return;
             }
 
+            setPosition(state.position);
+
             if (lyricSync) {
                 setLyricLine((prevLine) => {
                     if (lyrics && lyrics[0].timestamp !== undefined) {
@@ -315,7 +318,7 @@ export default function WebPlayback({ token }: { token: string }) {
         return () => {
             clearInterval(interval);
         };
-    }, [webPlayer, paused, lyrics, lyricLine]);
+    }, [webPlayer, paused, lyrics, lyricLine, position]);
 
     return (
         <div className="playback-container">
@@ -330,6 +333,8 @@ export default function WebPlayback({ token }: { token: string }) {
             <PlaybackControl
                 currentTrack={currentTrack}
                 paused={paused}
+                position={position}
+                trackDuration={currentTrack?.duration_ms}
                 webPlayer={webPlayer}
                 showTranslation={showTranslation}
                 onToggleTranslation={handleToggleTranslation}

@@ -1,13 +1,26 @@
-footer.playback-control {
+footer.app-footer {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    color: white;
+    flex-direction: column;
     background-color: black;
     position: fixed;
     width: 100vw;
-    height: 5.5rem;
+    height: 82px;
     bottom: 0;
+}
+
+.playback-seeker {
+    position: fixed;
+    top: -0.8rem;
+}
+
+.playback-control {
+    display: flex;
+    position: fixed;
+    bottom: 0.5rem;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    color: white;
 }
 
 .current-track {
