@@ -48,8 +48,16 @@ export default function Lyrics({
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
-                    translation[translationIndex].translation !== line.lyric ? (
-                        <span className="lyric-translation">{`${translation[translationIndex].translation}\n`}</span>
+                    translation[translationIndex].translatedText !==
+                        line.lyric ? (
+                        <span className="lyric-translation">{`${translation[translationIndex].translatedText}\n`}</span>
+                    ) : null}
+                    {showTranslation &&
+                    !verseBreak &&
+                    translation &&
+                    translation[translationIndex] &&
+                    translation[translationIndex].romanizedText ? (
+                        <span className="lyric-romanization">{`${translation[translationIndex].romanizedText}\n`}</span>
                     ) : null}
                     <span>{`${line.lyric}\n`}</span>
                 </div>

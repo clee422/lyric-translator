@@ -47,6 +47,7 @@ div.lyric-line.synced-lyric:not(.current-line):hover span {
     font-style: italic;
 }
 
-.lyric-translation {
+.lyric-translation,
+.lyric-romanization {
     font-style: italic;
 }
