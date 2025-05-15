@@ -218,7 +218,7 @@ async function romanizeLyrics(lyrics, sourceLanguage) {
         });
     } else if (chineseLanguageCodes.has(sourceLanguage)) {
         return lyrics.map((line) => {
-            const romanized = pinyin(line);
+            const romanized = pinyin(line, { keepRest: true });
             return romanized.charAt(0).toUpperCase() + romanized.slice(1);
         });
     }
