@@ -5,8 +5,7 @@ import {
     SkipPrevious,
     Translate,
 } from "@mui/icons-material";
-import { duration, Slider, Switch } from "@mui/material";
-// import { Seekbar } from "react-seekbar"
+import { Slider, Switch } from "@mui/material";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({

@@ -30,6 +30,7 @@ export default function WebPlayback({ token }: { token: string }) {
 
     // Period for playback position updates (in milliseconds)
     const positionPollingRate: number = 200;
+    const targetLanguage = "en";
 
     function onTrackChange(stateCurrentTrack: Spotify.Track): void {
         // Clear previous lyrics on track change
@@ -165,7 +166,10 @@ export default function WebPlayback({ token }: { token: string }) {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ lyrics: lyrics }),
+            body: JSON.stringify({
+                lyrics: lyrics,
+                targetLanguage: "en",
+            }),
         })
             .then((res) => {
                 if (res.status == StatusCodes.OK) {
@@ -326,6 +330,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 lyrics={lyrics}
                 currentLine={lyricLine}
                 onLyricClick={handleLyricClick}
+                targetLanguage={targetLanguage}
                 translation={translation}
                 showTranslation={showTranslation}
                 lyricSync={lyricSync}

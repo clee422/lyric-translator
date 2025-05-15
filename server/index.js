@@ -5,6 +5,8 @@ import crypto from "crypto";
 import { StatusCodes } from "http-status-codes";
 import { URLSearchParams } from "url";
 import { TranslationServiceClient } from "@google-cloud/translate";
+import { romanize as romanizeKorean } from "@romanize/korean";
+import pinyin from "chinese-to-pinyin";
 
 const clientPort = 3000;
 const serverPort = 5000;
@@ -20,7 +22,7 @@ app.use(bodyParser.json());
 const translationClient = new TranslationServiceClient();
 // Google Cloud Translation API romanization supported languages
 // (https://cloud.google.com/translate/docs/languages#roman)
-const romanizeTextSupportedLanguages = new Set([
+const googleRomanizeTextSupportedLanguages = new Set([
     "ar",
     "am",
     "bn",
@@ -32,6 +34,7 @@ const romanizeTextSupportedLanguages = new Set([
     "sr",
     "uk",
 ]);
+const chineseLanguageCodes = new Set(["zh-CN", "zh-TW", "zh-HK", "zh-SG"]);
 
 let accessToken;
 let codeVerifier;
@@ -135,11 +138,11 @@ app.get("/player/lyrics", (req, res) => {
 });
 
 app.post("/player/translate", async (req, res) => {
-    const targetLanguage = "en";
     const lyrics = req.body.lyrics;
     if (!lyrics) {
         res.status(StatusCodes.BAD_REQUEST).end();
     } else {
+        const targetLanguage = req.body.targetLanguage;
         const translation = await translateLyrics(lyrics, targetLanguage);
         const romanizedLyrics = await romanizeLyrics(
             lyrics,
@@ -201,15 +204,25 @@ async function translateLyrics(lyrics, targetLanguage) {
 }
 
 async function romanizeLyrics(lyrics, sourceLanguage) {
-    if (!romanizeTextSupportedLanguages.has(sourceLanguage)) {
-        return undefined;
+    if (googleRomanizeTextSupportedLanguages.has(sourceLanguage)) {
+        const [romanizeResponse] = await translationClient.romanizeText({
+            parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
+            contents: lyrics,
+            sourceLanguageCode: sourceLanguage,
+        });
+        return romanizeResponse.romanizations.map((line) => line.romanizedText);
+    } else if (sourceLanguage === "ko") {
+        return lyrics.map((line) => {
+            const romanized = romanizeKorean(line, { system: "RR" });
+            return romanized.charAt(0).toUpperCase() + romanized.slice(1);
+        });
+    } else if (chineseLanguageCodes.has(sourceLanguage)) {
+        return lyrics.map((line) => {
+            const romanized = pinyin(line);
+            return romanized.charAt(0).toUpperCase() + romanized.slice(1);
+        });
     }
-    const [romanizeResponse] = await translationClient.romanizeText({
-        parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
-        contents: lyrics,
-        sourceLanguageCode: sourceLanguage,
-    });
-    return romanizeResponse.romanizations.map((line) => line.romanizedText);
+    return undefined;
 }
 
 app.listen(serverPort, () => {

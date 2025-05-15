@@ -6,6 +6,7 @@ export default function Lyrics({
     lyrics,
     currentLine,
     onLyricClick,
+    targetLanguage,
     translation,
     showTranslation,
     lyricSync,
@@ -13,6 +14,7 @@ export default function Lyrics({
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
+    targetLanguage: string;
     translation: TranslationLine[] | undefined;
     showTranslation: boolean;
     lyricSync: boolean | undefined;
@@ -56,6 +58,8 @@ export default function Lyrics({
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
+                    translation[translationIndex].detectedLanguage !=
+                        targetLanguage &&
                     translation[translationIndex].romanizedText ? (
                         <span className="lyric-romanization">{`${translation[translationIndex].romanizedText}\n`}</span>
                     ) : null}
