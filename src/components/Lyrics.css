@@ -1,3 +1,10 @@
+:root {
+    --current-line-color: #f0f0f0;
+    --synced-lyric-color: #828282;
+    --synced-lyric-hover-background-color: #2e2e2e;
+    --plain-lyrics-color: #d2d2d2;
+}
+
 .lyrics-container {
     display: flex;
     justify-content: center;
@@ -24,16 +31,19 @@
 }
 
 .synced-lyric > span {
-    color: #828282;
+    color: var(--synced-lyric-color);
 }
 
-div.lyric-line.current-line > span,
+div.lyric-line.current-line > span {
+    color: var(--current-line-color);
+}
+
 .plain-lyric > span {
-    color: rgb(240, 240, 240);
+    color: var(--plain-lyrics-color);
 }
 
 div.lyric-line.synced-lyric:hover {
-    background-color: #2e2e2e;
+    background-color: var(--synced-lyric-hover-background-color);
     border-radius: 8px;
     cursor: pointer;
 }
@@ -43,7 +53,7 @@ div.lyric-line.synced-lyric:not(.current-line):hover span {
 }
 
 .lyrics-unavailable > span {
-    color: rgb(240, 240, 240);
+    color: var(--current-line-color);
     font-style: italic;
 }
 

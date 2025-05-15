@@ -122,7 +122,9 @@ export default function PlaybackControl({
                         sx={{
                             // Switched ON color
                             ".css-161ms7l-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                { backgroundColor: "white" },
+                                {
+                                    backgroundColor: "white",
+                                },
                             // Switched OFF color
                             ".MuiSwitch-track": {
                                 backgroundColor: "#828282",

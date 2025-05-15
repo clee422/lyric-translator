@@ -1,7 +1,11 @@
+:root {
+    --app-background-color: #121212;
+}
+
 body {
     margin: 0;
     font-family: "Inter", sans-serif;
-    background-color: #121212;
+    background-color: var(--app-background-color);
 }
 
 main.app {
