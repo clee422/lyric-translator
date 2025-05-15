@@ -35,9 +35,26 @@ export default function PlaybackControl({
                 min={0}
                 max={trackDuration}
                 step={1}
-                sx={{
+                sx={(t) => ({
                     color: "rgb(200, 200, 200)",
-                }}
+                    "& .MuiSlider-thumb": {
+                        width: 0,
+                        height: 0,
+                        transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                        "&:hover, &.Mui-focusVisible": {
+                            boxShadow: `0px 0px 0px 8px ${"rgb(0 0 0 / 16%)"}`,
+                            ...t.applyStyles("dark", {
+                                boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
+                            }),
+                            width: 8,
+                            height: 8,
+                        },
+                        "&.Mui-active": {
+                            width: 12,
+                            height: 12,
+                        },
+                    },
+                })}
                 onChange={(_, value) => {
                     webPlayer?.seek(value);
                 }}
@@ -99,6 +116,18 @@ export default function PlaybackControl({
                     <Switch
                         checked={showTranslation}
                         onChange={onToggleTranslation}
+                        style={{
+                            color: "white",
+                        }}
+                        sx={{
+                            // Switched ON color
+                            ".css-161ms7l-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                                { backgroundColor: "white" },
+                            // Switched OFF color
+                            ".MuiSwitch-track": {
+                                backgroundColor: "#828282",
+                            },
+                        }}
                     />
                 </div>
             </div>
