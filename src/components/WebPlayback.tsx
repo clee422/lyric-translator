@@ -22,6 +22,7 @@ export default function WebPlayback({ token }: { token: string }) {
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [position, setPosition] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>();
     const [translation, setTranslation] = useState<TranslationLine[]>();
@@ -36,20 +37,16 @@ export default function WebPlayback({ token }: { token: string }) {
 
     function onTrackChange(stateCurrentTrack: Spotify.Track): void {
         // Clear previous lyrics on track change
-        setLyrics([
-            {
-                timestamp: 0,
-                lyric: "Loading lyrics...",
-            },
-        ]);
+        setLyrics([]);
         setTranslation([]);
         setLyricSync(false);
         setLyricLine(undefined);
-
+        setLoading(true);
         setCurrentTrack(stateCurrentTrack);
         getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
             setTrackLyrics(lyricsJson);
             translateLyrics(lyricsJson);
+            setLoading(false);
         });
     }
 
@@ -340,6 +337,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 lyrics={lyrics}
                 currentLine={lyricLine}
                 onLyricClick={handleLyricClick}
+                loading={loading}
                 targetLanguage={targetLanguage}
                 translation={translation}
                 showOriginalLyrics={showOriginalLyrics}

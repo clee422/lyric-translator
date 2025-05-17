@@ -94,7 +94,13 @@ export async function translate(req, res) {
             );
         } else if (sourceLanguage === "ko") {
             return lyrics.map((line) => {
-                const romanized = romanizeKorean(line, { system: "RR" });
+                let romanized = "";
+                try {
+                    romanized = romanizeKorean(line, { system: "RR" });
+                } catch {
+                    return romanized;
+                }
+
                 return romanized.charAt(0).toUpperCase() + romanized.slice(1);
             });
         } else if (chineseLanguageCodes.has(sourceLanguage)) {

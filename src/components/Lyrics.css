@@ -15,7 +15,9 @@
 }
 
 .lyrics {
-    width: fit-content;
+    min-width: 20%;
+    max-width: 80%;
+    padding-left: 5%;
     height: fit-content;
     margin-block: 5vh;
 }
@@ -36,6 +38,8 @@
 
 div.lyric-line.current-line > span {
     color: var(--current-line-color);
+    font-weight: 500;
+    font-size: large;
 }
 
 .plain-lyric > span {

@@ -1,11 +1,14 @@
 import { clsx } from "clsx";
 import type { LyricLine, TranslationLine } from "./WebPlayback";
+import { CircularProgress } from "@mui/material";
+import { useEffect, useState } from "react";
 import "./Lyrics.css";
 
 export default function Lyrics({
     lyrics,
     currentLine,
     onLyricClick,
+    loading,
     targetLanguage,
     translation,
     showOriginalLyrics,
@@ -16,6 +19,7 @@ export default function Lyrics({
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
+    loading: boolean;
     targetLanguage: string;
     translation: TranslationLine[] | undefined;
     showOriginalLyrics: boolean;
@@ -23,6 +27,35 @@ export default function Lyrics({
     showRomanization: boolean;
     lyricSync: boolean | undefined;
 }) {
+    const [lyricsWidth, setLyricsWidth] = useState<number>();
+
+    // Calculate width of lyrics based on longest line
+    useEffect(() => {
+        let maxChars: number = 0;
+        if (showTranslation || showRomanization) {
+            translation?.forEach((line) => {
+                if (showTranslation) {
+                    maxChars = Math.max(maxChars, line.translatedText?.length);
+                }
+                if (showRomanization) {
+                    maxChars = Math.max(maxChars, line.romanizedText?.length);
+                }
+            });
+        }
+        if (showOriginalLyrics) {
+            lyrics?.forEach(
+                (line) => (maxChars = Math.max(maxChars, line.lyric.length))
+            );
+        }
+        setLyricsWidth(maxChars * 0.62);
+    }, [
+        showOriginalLyrics,
+        showTranslation,
+        showRomanization,
+        lyrics,
+        translation,
+    ]);
+
     function renderLyrics() {
         if (!lyrics) {
             return (
@@ -91,7 +124,25 @@ export default function Lyrics({
 
     return (
         <div className="lyrics-container">
-            <div className="lyrics">{renderLyrics()}</div>
+            {loading ? (
+                <CircularProgress
+                    color="inherit"
+                    size="7rem"
+                    style={{
+                        color: "#545454",
+                        marginTop: "30vh",
+                    }}
+                />
+            ) : (
+                <div
+                    className="lyrics"
+                    style={{
+                        width: lyricSync ? `${lyricsWidth}rem` : "fit-content",
+                    }}
+                >
+                    {renderLyrics()}
+                </div>
+            )}
         </div>
     );
 }
