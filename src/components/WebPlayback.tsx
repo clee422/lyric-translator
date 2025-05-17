@@ -25,7 +25,9 @@ export default function WebPlayback({ token }: { token: string }) {
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [lyricLine, setLyricLine] = useState<number>();
     const [translation, setTranslation] = useState<TranslationLine[]>();
+    const [showOriginalLyrics, setShowOriginalLyrics] = useState<boolean>(true);
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
+    const [showRomanization, setShowRomanization] = useState<boolean>(true);
     const [lyricSync, setLyricSync] = useState<boolean>();
 
     // Period for playback position updates (in milliseconds)
@@ -237,8 +239,16 @@ export default function WebPlayback({ token }: { token: string }) {
         }
     }
 
+    function handleToggleOriginalLyrics() {
+        setShowOriginalLyrics((prev) => !prev);
+    }
+
     function handleToggleTranslation() {
-        setShowTranslation((prevShowTranslation) => !prevShowTranslation);
+        setShowTranslation((prev) => !prev);
+    }
+
+    function handleToggleRomanization() {
+        setShowRomanization((prev) => !prev);
     }
 
     useEffect(() => {
@@ -312,7 +322,7 @@ export default function WebPlayback({ token }: { token: string }) {
         };
     }, []);
 
-    // Updating rack position timer
+    // Updating track position timer
     useEffect(() => {
         const interval = setInterval(
             () => updatePosition(),
@@ -332,7 +342,9 @@ export default function WebPlayback({ token }: { token: string }) {
                 onLyricClick={handleLyricClick}
                 targetLanguage={targetLanguage}
                 translation={translation}
+                showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
+                showRomanization={showRomanization}
                 lyricSync={lyricSync}
             />
             <PlaybackControl
@@ -341,8 +353,12 @@ export default function WebPlayback({ token }: { token: string }) {
                 position={position}
                 trackDuration={currentTrack?.duration_ms}
                 webPlayer={webPlayer}
+                showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
+                showRomanization={showRomanization}
+                onToggleOriginalLyrics={handleToggleOriginalLyrics}
                 onToggleTranslation={handleToggleTranslation}
+                onToggleRomanization={handleToggleRomanization}
             />
         </div>
     );

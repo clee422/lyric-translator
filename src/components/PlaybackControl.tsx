@@ -5,7 +5,18 @@ import {
     SkipPrevious,
     Translate,
 } from "@mui/icons-material";
-import { Slider, Switch } from "@mui/material";
+import {
+    alpha,
+    FormControlLabel,
+    FormGroup,
+    IconButton,
+    Menu,
+    MenuItem,
+    Slider,
+    styled,
+    Switch,
+} from "@mui/material";
+import { useState } from "react";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({
@@ -14,17 +25,56 @@ export default function PlaybackControl({
     position,
     trackDuration,
     webPlayer,
+    showOriginalLyrics,
     showTranslation,
+    showRomanization,
+    onToggleOriginalLyrics,
     onToggleTranslation,
+    onToggleRomanization,
 }: {
     currentTrack: Spotify.Track | undefined;
     paused: boolean | undefined;
     position: number;
     trackDuration: number | undefined;
     webPlayer: Spotify.Player | undefined;
+    showOriginalLyrics: boolean;
     showTranslation: boolean;
+    showRomanization: boolean;
+    onToggleOriginalLyrics: any;
     onToggleTranslation: any;
+    onToggleRomanization: any;
 }) {
+    const [anchorEl, setAnchorElem] = useState<null | HTMLElement>(null);
+
+    const open = Boolean(anchorEl);
+
+    const LyricSwitch = styled(Switch)(({ theme }) => {
+        const thumbColor = "#F0F0F0";
+        const trackColor = "#777777";
+        return {
+            "& .MuiSwitch-switchBase.Mui-checked": {
+                color: thumbColor,
+                "&:hover": {
+                    backgroundColor: alpha(
+                        thumbColor,
+                        theme.palette.action.hoverOpacity
+                    ),
+                },
+            },
+            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: trackColor,
+            },
+        };
+    });
+
+    function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+        setAnchorElem(event.currentTarget);
+    }
+
+    function handleClose() {
+        setAnchorElem(null);
+    }
+
     return (
         <footer className="app-footer">
             <Slider
@@ -111,25 +161,73 @@ export default function PlaybackControl({
                     </button>
                 </div>
                 <div className="toggle-translate">
-                    <Translate />
-                    <Switch
-                        checked={showTranslation}
-                        onChange={onToggleTranslation}
-                        style={{
-                            color: "white",
+                    <IconButton onClick={handleClick}>
+                        <Translate />
+                    </IconButton>
+                    <Menu
+                        anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
                         }}
+                        transformOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                        }}
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
                         sx={{
-                            // Switched ON color
-                            ".css-161ms7l-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                {
-                                    backgroundColor: "white",
-                                },
-                            // Switched OFF color
-                            ".MuiSwitch-track": {
-                                backgroundColor: "#828282",
+                            ".MuiPaper-root": {
+                                color: "white",
+                                backgroundColor: "#1E1E1E",
+                            },
+                            ".MuiMenuItem-root:hover": {
+                                backgroundColor: "#2D2D2D",
+                            },
+                            ".MuiFormControlLabel-label": {
+                                fontFamily: `"Inter", sans-serif`,
+                                fontWeight: "300",
+                                marginLeft: "0.5rem",
                             },
                         }}
-                    />
+                    >
+                        <FormGroup>
+                            <MenuItem>
+                                <FormControlLabel
+                                    control={
+                                        <LyricSwitch
+                                            checked={showOriginalLyrics}
+                                            onChange={onToggleOriginalLyrics}
+                                            color="default"
+                                        />
+                                    }
+                                    label="Original Lyrics"
+                                />
+                            </MenuItem>
+                            <MenuItem>
+                                <FormControlLabel
+                                    control={
+                                        <LyricSwitch
+                                            checked={showTranslation}
+                                            onChange={onToggleTranslation}
+                                        />
+                                    }
+                                    label="Translation"
+                                />
+                            </MenuItem>
+                            <MenuItem>
+                                <FormControlLabel
+                                    control={
+                                        <LyricSwitch
+                                            checked={showRomanization}
+                                            onChange={onToggleRomanization}
+                                        />
+                                    }
+                                    label="Romanization"
+                                />
+                            </MenuItem>
+                        </FormGroup>
+                    </Menu>
                 </div>
             </div>
         </footer>

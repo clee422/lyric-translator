@@ -8,7 +8,9 @@ export default function Lyrics({
     onLyricClick,
     targetLanguage,
     translation,
+    showOriginalLyrics,
     showTranslation,
+    showRomanization,
     lyricSync,
 }: {
     lyrics: LyricLine[] | undefined;
@@ -16,7 +18,9 @@ export default function Lyrics({
     onLyricClick: any;
     targetLanguage: string;
     translation: TranslationLine[] | undefined;
+    showOriginalLyrics: boolean;
     showTranslation: boolean;
+    showRomanization: boolean;
     lyricSync: boolean | undefined;
 }) {
     function renderLyrics() {
@@ -54,7 +58,7 @@ export default function Lyrics({
                         line.lyric ? (
                         <span className="lyric-translation">{`${translation[translationIndex].translatedText}\n`}</span>
                     ) : null}
-                    {showTranslation &&
+                    {showRomanization &&
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
@@ -63,7 +67,9 @@ export default function Lyrics({
                     translation[translationIndex].romanizedText ? (
                         <span className="lyric-romanization">{`${translation[translationIndex].romanizedText}\n`}</span>
                     ) : null}
-                    <span>{`${line.lyric}\n`}</span>
+                    {showOriginalLyrics ? (
+                        <span>{`${line.lyric}\n`}</span>
+                    ) : null}
                 </div>
             );
         });
