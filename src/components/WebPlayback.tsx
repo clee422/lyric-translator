@@ -220,7 +220,6 @@ export default function WebPlayback({ token }: { token: string }) {
                             let m = Math.floor((l + r) / 2);
                             if (lyrics[m].timestamp === undefined) {
                                 // If lyrics[m] is a verse break
-                                console.log(m);
                                 if (state.position < lyrics[m + 1].timestamp!) {
                                     r = m - 1;
                                 } else {
