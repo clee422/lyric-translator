@@ -117,7 +117,6 @@ export default function WebPlayback({ token }: { token: string }) {
                         lyric: "",
                     };
                 }
-
                 const parts = /\[(\d{2}):(\d{2}).(\d{2})\] (.+)/.exec(
                     synced[syncedLyricsIndex]
                 );
