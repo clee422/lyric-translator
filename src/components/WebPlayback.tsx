@@ -66,7 +66,7 @@ export default function WebPlayback({ token }: { token: string }) {
         });
 
         try {
-            return fetch(`/player/lyrics?${queryParams}`).then((res) => {
+            return fetch(`/lyrics/get-lyrics?${queryParams}`).then((res) => {
                 if (res.status == StatusCodes.OK) {
                     return res.json();
                 } else if (res.status == StatusCodes.NOT_FOUND) {
@@ -163,7 +163,7 @@ export default function WebPlayback({ token }: { token: string }) {
         const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "");
-        fetch("/player/translate", {
+        fetch("/lyrics/translate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

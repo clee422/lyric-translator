@@ -3,7 +3,7 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import { lyrics, translate } from "./playback.js";
+import { lyrics, translate } from "./lyrics.js";
 import { login, callback, token } from "./auth.js";
 
 const PORT = 5000;
@@ -30,9 +30,9 @@ app.get("/auth/callback", callback);
 
 app.get("/auth/token", token);
 
-app.get("/player/lyrics", lyrics);
+app.get("/lyrics/get-lyrics", lyrics);
 
-app.post("/player/translate", translate);
+app.post("/lyrics/translate", translate);
 
 app.listen(PORT, () => {
     console.log(`Server started at http://127.0.0.1:${PORT}`);
