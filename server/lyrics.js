@@ -21,7 +21,7 @@ const chineseLanguageCodes = new Set(["zh-CN", "zh-TW", "zh-HK", "zh-SG"]);
 
 const translationClient = new TranslationServiceClient();
 
-export async function lyrics(req, res) {
+export async function getLyrics(req, res) {
     const queryParams = req.url.split("?")[1];
     fetch(`https://lrclib.net/api/get?${queryParams}`, {
         headers: {
