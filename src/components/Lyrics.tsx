@@ -50,6 +50,7 @@ export default function Lyrics({
                     className={classNames}
                     onClick={lyricSync ? () => onLyricClick(index) : undefined}
                 >
+                    {/* Translated lyric */}
                     {showTranslation &&
                     !verseBreak &&
                     translation &&
@@ -58,16 +59,27 @@ export default function Lyrics({
                         line.lyric ? (
                         <span className="lyric-translation">{`${translation[translationIndex].translatedText}\n`}</span>
                     ) : null}
+                    {/* Romanized lyric */}
                     {showRomanization &&
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
-                    translation[translationIndex].detectedLanguage !=
+                    translation[translationIndex].detectedLanguage !==
                         targetLanguage &&
                     translation[translationIndex].romanizedText ? (
                         <span className="lyric-romanization">{`${translation[translationIndex].romanizedText}\n`}</span>
                     ) : null}
-                    {showOriginalLyrics ? (
+                    {/* Original lyric */}
+                    {showOriginalLyrics ||
+                    verseBreak ||
+                    (showTranslation &&
+                        translation &&
+                        translation[translationIndex].detectedLanguage ===
+                            targetLanguage) ||
+                    (showRomanization &&
+                        translation &&
+                        translation[translationIndex].detectedLanguage ===
+                            targetLanguage) ? (
                         <span>{`${line.lyric}\n`}</span>
                     ) : null}
                 </div>
