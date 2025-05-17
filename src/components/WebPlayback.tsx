@@ -103,20 +103,30 @@ export default function WebPlayback({ token }: { token: string }) {
             const plainLyricsSplit: string[] =
                 lyricsJson.plainLyrics.split("\n");
 
-            const newLyrics = plainLyricsSplit.map((line) => {
+            let newLyrics = plainLyricsSplit.map((line) => {
+                if (syncedLyricsIndex >= synced.length) {
+                    return {
+                        invalid: true,
+                        lyric: "",
+                        timestamp: undefined,
+                    };
+                }
                 if (line === "") {
                     return {
                         timestamp: undefined,
                         lyric: "",
                     };
                 }
+
                 const parts = /\[(\d{2}):(\d{2}).(\d{2})\] (.+)/.exec(
                     synced[syncedLyricsIndex]
                 );
+                syncedLyricsIndex += 1;
                 if (!parts) {
                     return {
+                        invalid: true,
+                        lyric: "",
                         timestamp: undefined,
-                        lyric: "Lyrics could not be found",
                     };
                 }
                 // Compute timestamp in ms
@@ -126,13 +136,14 @@ export default function WebPlayback({ token }: { token: string }) {
                     parseInt(parts[3]) * 10;
                 const lyric = parts[4];
 
-                syncedLyricsIndex += 1;
-
                 return {
                     lyric: lyric,
                     timestamp: timestamp,
                 };
             });
+            newLyrics = newLyrics.filter((line) =>
+                line.invalid ? false : true
+            );
             setLyrics(newLyrics);
             setLyricSync(true);
         } else if (lyricsJson.plainLyrics) {
@@ -210,6 +221,7 @@ export default function WebPlayback({ token }: { token: string }) {
                             let m = Math.floor((l + r) / 2);
                             if (lyrics[m].timestamp === undefined) {
                                 // If lyrics[m] is a verse break
+                                console.log(m);
                                 if (state.position < lyrics[m + 1].timestamp!) {
                                     r = m - 1;
                                 } else {
