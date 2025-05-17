@@ -58,11 +58,7 @@ export default function Lyrics({
 
     function renderLyrics() {
         if (!lyrics) {
-            return (
-                <div className="lyrics-unavailable">
-                    <span>Lyrics not available for this song</span>
-                </div>
-            );
+            return null;
         }
         let translationIndex = -1;
 
@@ -133,7 +129,7 @@ export default function Lyrics({
                         marginTop: "30vh",
                     }}
                 />
-            ) : (
+            ) : lyrics ? (
                 <div
                     className="lyrics"
                     style={{
@@ -141,6 +137,10 @@ export default function Lyrics({
                     }}
                 >
                     {renderLyrics()}
+                </div>
+            ) : (
+                <div className="lyrics-unavailable">
+                    <span>Lyrics not available for this song</span>
                 </div>
             )}
         </div>
