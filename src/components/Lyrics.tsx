@@ -23,6 +23,35 @@ export default function Lyrics({
     showRomanization: boolean;
     lyricSync: boolean | undefined;
 }) {
+    const [lyricsWidth, setLyricsWidth] = useState<number>();
+
+    // Calculate width of lyrics based on longest line
+    useEffect(() => {
+        let maxChars: number = 0;
+        if (showTranslation || showRomanization) {
+            translation?.forEach((line) => {
+                if (showTranslation) {
+                    maxChars = Math.max(maxChars, line.translatedText?.length);
+                }
+                if (showRomanization) {
+                    maxChars = Math.max(maxChars, line.romanizedText?.length);
+                }
+            });
+        }
+        if (showOriginalLyrics) {
+            lyrics?.forEach(
+                (line) => (maxChars = Math.max(maxChars, line.lyric.length))
+            );
+        }
+        setLyricsWidth(maxChars * 0.65);
+    }, [
+        showOriginalLyrics,
+        showTranslation,
+        showRomanization,
+        lyrics,
+        translation,
+    ]);
+
     function renderLyrics() {
         if (!lyrics) {
             return (
@@ -55,6 +84,8 @@ export default function Lyrics({
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
+                    translation[translationIndex].detectedLanguage !==
+                        targetLanguage &&
                     translation[translationIndex].translatedText !==
                         line.lyric ? (
                         <span className="lyric-translation">{`${translation[translationIndex].translatedText}\n`}</span>

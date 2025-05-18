@@ -98,7 +98,7 @@ export default function WebPlayback({ token }: { token: string }) {
             const synced: string[] = lyricsJson.syncedLyrics
                 .split("\n")
                 .filter((line: string) =>
-                    /\[\d{2}:\d{2}.\d{2}\] .+/.test(line)
+                    /\[\d{2}:\d{2}.\d{2}\]\s*.+/.test(line)
                 );
 
             // Use plain lyrics to determine linebreak for new verse
@@ -113,7 +113,7 @@ export default function WebPlayback({ token }: { token: string }) {
                         lyric: "",
                     };
                 }
-                const parts = /\[(\d{2}):(\d{2}).(\d{2})\] (.+)/.exec(
+                const parts = /\[(\d{2}):(\d{2}).(\d{2})\]\s*(.+)/.exec(
                     synced[syncedLyricsIndex]
                 );
                 if (!parts) {
