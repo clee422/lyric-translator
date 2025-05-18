@@ -113,7 +113,7 @@ export default function WebPlayback({ token }: { token: string }) {
                         timestamp: undefined,
                     };
                 }
-                if (line === "") {
+                if (!/\S+/.test(line)) {
                     return {
                         timestamp: undefined,
                         lyric: "",

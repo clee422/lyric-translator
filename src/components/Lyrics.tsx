@@ -63,7 +63,7 @@ export default function Lyrics({
         let translationIndex = -1;
 
         const lyricElements = lyrics.map((line, index) => {
-            const verseBreak: boolean = line.lyric === "";
+            const verseBreak: boolean = !/\S+/.test(line.lyric);
             const classNames = clsx("lyric-line", {
                 "verse-break": verseBreak,
                 "plain-lyric": !verseBreak && !lyricSync,
