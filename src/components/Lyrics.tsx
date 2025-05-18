@@ -47,7 +47,7 @@ export default function Lyrics({
                 (line) => (maxChars = Math.max(maxChars, line.lyric.length))
             );
         }
-        setLyricsWidth(maxChars * 0.62);
+        setLyricsWidth(maxChars * 0.65);
     }, [
         showOriginalLyrics,
         showTranslation,
@@ -84,6 +84,8 @@ export default function Lyrics({
                     !verseBreak &&
                     translation &&
                     translation[translationIndex] &&
+                    translation[translationIndex].detectedLanguage !==
+                        targetLanguage &&
                     translation[translationIndex].translatedText !==
                         line.lyric ? (
                         <span className="lyric-translation">{`${translation[translationIndex].translatedText}\n`}</span>
