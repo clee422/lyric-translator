@@ -25,7 +25,6 @@
 .lyric-line {
     width: fit-content;
     margin-block: 0.5rem;
-    /* padding: 0.15rem 0.4rem; */
     padding: 0.3rem 0.6rem;
 }
 
@@ -41,7 +40,6 @@
 div.lyric-line.current-line > span {
     color: var(--current-line-color);
     font-weight: 500;
-    /* font-size: large; */
     font-size: larger;
 }
 
