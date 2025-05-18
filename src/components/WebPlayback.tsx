@@ -42,6 +42,8 @@ export default function WebPlayback({ token }: { token: string }) {
         setLyricSync(false);
         setLyricLine(undefined);
         setLoading(true);
+
+        // Get and set current track lyrics and translations
         setCurrentTrack(stateCurrentTrack);
         getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
             setTrackLyrics(lyricsJson);
@@ -63,7 +65,7 @@ export default function WebPlayback({ token }: { token: string }) {
         });
 
         try {
-            return fetch(`/lyrics/get-lyrics?${queryParams}`).then((res) => {
+            return fetch(`/song/lyrics?${queryParams}`).then((res) => {
                 if (res.status == StatusCodes.OK) {
                     return res.json();
                 } else if (res.status == StatusCodes.NOT_FOUND) {
@@ -170,20 +172,20 @@ export default function WebPlayback({ token }: { token: string }) {
         const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "");
-        fetch("/lyrics/translate", {
+        fetch("/song/translate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                lyrics: lyrics,
-                targetLanguage: "en",
+                content: lyrics,
+                targetLanguage: targetLanguage,
             }),
         })
             .then((res) => {
                 if (res.status == StatusCodes.OK) {
                     res.json().then((json) =>
-                        setTranslation(json.translatedLyrics)
+                        setTranslation(json.translatedContent)
                     );
                 } else {
                     console.error(
@@ -367,6 +369,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 onToggleOriginalLyrics={handleToggleOriginalLyrics}
                 onToggleTranslation={handleToggleTranslation}
                 onToggleRomanization={handleToggleRomanization}
+                targetLanguage={targetLanguage}
             />
         </div>
     );

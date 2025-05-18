@@ -16,7 +16,8 @@ import {
     styled,
     Switch,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { StatusCodes } from "http-status-codes";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({
@@ -31,6 +32,7 @@ export default function PlaybackControl({
     onToggleOriginalLyrics,
     onToggleTranslation,
     onToggleRomanization,
+    targetLanguage,
 }: {
     currentTrack: Spotify.Track | undefined;
     paused: boolean | undefined;
@@ -43,8 +45,14 @@ export default function PlaybackControl({
     onToggleOriginalLyrics: any;
     onToggleTranslation: any;
     onToggleRomanization: any;
+    targetLanguage: string;
 }) {
     const [anchorEl, setAnchorElem] = useState<null | HTMLElement>(null);
+    const [translateTrackName, setTranslateTrackName] =
+        useState<boolean>(false);
+    const [trackNameTranslation, setTrackNameTranslation] = useState<
+        string | undefined
+    >();
 
     const open = Boolean(anchorEl);
 
@@ -67,11 +75,55 @@ export default function PlaybackControl({
         };
     });
 
-    function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+    async function translateTrackInfo(trackName: string | undefined) {
+        if (!trackName) {
+            return;
+        }
+        const translationRes = await fetch("/song/translate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: [trackName],
+                targetLanguage: targetLanguage,
+            }),
+        });
+        if (translationRes.status == StatusCodes.OK) {
+            translationRes.json().then((json) => {
+                const [translatedContent] = json.translatedContent;
+                if (translatedContent.detectedLanguage !== targetLanguage) {
+                    setTrackNameTranslation(translatedContent.translatedText);
+                }
+            });
+        } else {
+            console.error(
+                `Attempted to translate track info, response was status ${translationRes.status}`
+            );
+        }
+    }
+
+    // On track change
+    useEffect(() => {
+        // Show original song name by default
+        setTrackNameTranslation(undefined);
+        setTranslateTrackName(false);
+        translateTrackInfo(currentTrack?.name);
+    }, [currentTrack]);
+
+    function handleToggleTrackName() {
+        if (trackNameTranslation) {
+            setTranslateTrackName((prev) => !prev);
+        }
+    }
+
+    function handleClickTranslationMenu(
+        event: React.MouseEvent<HTMLButtonElement>
+    ) {
         setAnchorElem(event.currentTarget);
     }
 
-    function handleClose() {
+    function handleCloseTranslationMenu() {
         setAnchorElem(null);
     }
 
@@ -119,8 +171,17 @@ export default function PlaybackControl({
                     ) : null}
                     <div className="current-track-info">
                         {currentTrack?.name ? (
-                            <span className="current-track-name">
-                                {currentTrack.name + "\n"}
+                            <span
+                                className={`current-track-name${
+                                    trackNameTranslation !== undefined
+                                        ? " translate-track-name"
+                                        : ""
+                                }`}
+                                onClick={handleToggleTrackName}
+                            >
+                                {translateTrackName && trackNameTranslation
+                                    ? trackNameTranslation
+                                    : currentTrack.name + "\n"}
                             </span>
                         ) : null}
                         <span className="current-track-artist">
@@ -161,7 +222,7 @@ export default function PlaybackControl({
                     </button>
                 </div>
                 <div className="toggle-translate">
-                    <IconButton onClick={handleClick}>
+                    <IconButton onClick={handleClickTranslationMenu}>
                         <Translate />
                     </IconButton>
                     <Menu
@@ -175,7 +236,7 @@ export default function PlaybackControl({
                         }}
                         anchorEl={anchorEl}
                         open={open}
-                        onClose={handleClose}
+                        onClose={handleCloseTranslationMenu}
                         sx={{
                             ".MuiPaper-root": {
                                 color: "white",

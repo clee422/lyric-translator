@@ -64,6 +64,10 @@ footer.app-footer {
     margin-bottom: 0.1rem;
 }
 
+.translate-track-name:hover {
+    cursor: pointer;
+}
+
 .current-track-artist {
     font-size: 0.9rem;
     color: var(--playback-control-current-artist-color);
