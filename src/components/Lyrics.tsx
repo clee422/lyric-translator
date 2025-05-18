@@ -1,11 +1,14 @@
 import { clsx } from "clsx";
 import type { LyricLine, TranslationLine } from "./WebPlayback";
+import { CircularProgress } from "@mui/material";
+import { useEffect, useState } from "react";
 import "./Lyrics.css";
 
 export default function Lyrics({
     lyrics,
     currentLine,
     onLyricClick,
+    loading,
     targetLanguage,
     translation,
     showOriginalLyrics,
@@ -16,6 +19,7 @@ export default function Lyrics({
     lyrics: LyricLine[] | undefined;
     currentLine: number | undefined;
     onLyricClick: any;
+    loading: boolean;
     targetLanguage: string;
     translation: TranslationLine[] | undefined;
     showOriginalLyrics: boolean;
@@ -54,11 +58,7 @@ export default function Lyrics({
 
     function renderLyrics() {
         if (!lyrics) {
-            return (
-                <div className="lyrics-unavailable">
-                    <span>Lyrics not available for this song</span>
-                </div>
-            );
+            return null;
         }
         let translationIndex = -1;
 
@@ -122,7 +122,29 @@ export default function Lyrics({
 
     return (
         <div className="lyrics-container">
-            <div className="lyrics">{renderLyrics()}</div>
+            {loading ? (
+                <CircularProgress
+                    color="inherit"
+                    size="7rem"
+                    style={{
+                        color: "#545454",
+                        marginTop: "30vh",
+                    }}
+                />
+            ) : lyrics ? (
+                <div
+                    className="lyrics"
+                    style={{
+                        width: lyricSync ? `${lyricsWidth}rem` : "fit-content",
+                    }}
+                >
+                    {renderLyrics()}
+                </div>
+            ) : (
+                <div className="lyrics-unavailable">
+                    <span>Lyrics not available for this song</span>
+                </div>
+            )}
         </div>
     );
 }

@@ -15,7 +15,9 @@
 }
 
 .lyrics {
-    width: fit-content;
+    min-width: 20%;
+    max-width: 80%;
+    padding-left: 5%;
     height: fit-content;
     margin-block: 5vh;
 }
@@ -57,7 +59,8 @@ div.lyric-line.synced-lyric:not(.current-line):hover span {
     color: #dadada;
 }
 
-.lyrics-unavailable > span {
+.lyrics-unavailable {
+    margin-top: 40vh;
     color: var(--current-line-color);
     font-style: italic;
 }
