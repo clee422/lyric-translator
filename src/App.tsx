@@ -7,7 +7,7 @@ export default function App() {
 
     useEffect(() => {
         async function getToken() {
-            const response = await fetch("/auth/token");
+            const response = await fetch("/auth/spotify/token");
             const json = await response.json();
             setToken(json.access_token);
         }

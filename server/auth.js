@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export async function login(req, res) {
+export async function spotifyLogin(req, res) {
     const generateRandomString = (length) => {
         const possible =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -18,7 +18,7 @@ export async function login(req, res) {
         response_type: "code",
         client_id: process.env.SPOTIFY_CLIENT_ID,
         scope: "streaming user-read-email user-read-private",
-        redirect_uri: "http://127.0.0.1:3000/auth/callback",
+        redirect_uri: "http://127.0.0.1:3000/auth/spotify/callback",
         state: state,
     });
 
@@ -26,7 +26,7 @@ export async function login(req, res) {
     res.redirect(authUrl.toString());
 }
 
-export async function callback(req, res) {
+export async function spotifyCallback(req, res) {
     const code = req.query.code || null;
     const state = req.query.state || null;
 
@@ -47,7 +47,7 @@ export async function callback(req, res) {
                 },
                 body: new URLSearchParams({
                     code: code,
-                    redirect_uri: "http://127.0.0.1:3000/auth/callback",
+                    redirect_uri: "http://127.0.0.1:3000/auth/spotify/callback",
                     grant_type: "authorization_code",
                 }),
             }
@@ -59,7 +59,7 @@ export async function callback(req, res) {
     }
 }
 
-export async function token(req, res) {
+export async function spotifyToken(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:3000");
     res.header(
         "Access-Control-Allow-Headers",
