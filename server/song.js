@@ -1,8 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { TranslationServiceClient } from "@google-cloud/translate";
 import { romanize as romanizeKorean } from "@romanize/korean";
 import pinyin from "chinese-to-pinyin";
-import { defaultServerMainFields } from "vite";
 
 // Google Cloud Translation API romanization supported languages
 // (https://cloud.google.com/translate/docs/languages#roman)
@@ -19,8 +17,6 @@ const googleRomanizeTextSupportedLanguages = new Set([
     "uk",
 ]);
 const chineseLanguageCodes = new Set(["zh-CN", "zh-TW", "zh-HK", "zh-SG"]);
-
-const translationClient = new TranslationServiceClient();
 
 // Returns:
 // [
@@ -64,10 +60,15 @@ export async function translate(req, res) {
     if (!content || !targetLanguage) {
         res.status(StatusCodes.BAD_REQUEST).end();
     } else {
-        const translation = await translateContent(content, targetLanguage);
+        const translation = await translateContent(
+            content,
+            targetLanguage,
+            req.session.googleAccessToken
+        );
         const romanization = await romanizeContent(
             content,
-            translation.detectedLanguage
+            translation.detectedLanguage,
+            req.session.googleAccessToken
         );
 
         const translatedContent = translation.translatedText.map(
@@ -87,16 +88,26 @@ export async function translate(req, res) {
     }
 }
 
-async function translateContent(content, targetLanguage) {
-    const [translationResponse] = await translationClient.translateText({
-        parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
-        contents: content,
-        mimeType: "text/plain",
-        targetLanguageCode: targetLanguage,
-    });
+async function translateContent(content, targetLanguage, accessToken) {
+    const translationResponse = await fetch(
+        `https://translate.googleapis.com/v3/projects/${process.env.GOOGLE_PROJECT_ID}/locations/global:translateText`,
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                contents: content,
+                mimeType: "text/plain",
+                targetLanguageCode: targetLanguage,
+            }),
+        }
+    );
+    const translationJson = await translationResponse.json();
 
     const detectedLanguages = new Map();
-    const translatedText = translationResponse.translations.map((line) => {
+    const translatedText = translationJson.translations.map((line) => {
         if (detectedLanguages.has(line.detectedLanguageCode)) {
             detectedLanguages.set(
                 line.detectedLanguageCode,
@@ -126,14 +137,25 @@ async function translateContent(content, targetLanguage) {
     };
 }
 
-async function romanizeContent(content, sourceLanguage) {
+async function romanizeContent(content, sourceLanguage, accessToken) {
     if (googleRomanizeTextSupportedLanguages.has(sourceLanguage)) {
-        const [romanizeResponse] = await translationClient.romanizeText({
-            parent: `projects/${process.env.GOOGlE_PROJECT_ID}/locations/global`,
-            contents: content,
-            sourceLanguageCode: sourceLanguage,
-        });
-        return romanizeResponse.romanizations.map((line) => line.romanizedText);
+        const romanizeResponse = await fetch(
+            `https://translate.googleapis.com/v3/projects/${process.env.GOOGLE_PROJECT_ID}/locations/global:romanizeText`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    contents: content,
+                    sourceLanguageCode: sourceLanguage,
+                }),
+            }
+        );
+        const romanizeJson = await romanizeResponse.json();
+
+        return romanizeJson.romanizations.map((line) => line.romanizedText);
     } else if (sourceLanguage === "ko") {
         return content.map((line) => {
             let romanized = "";

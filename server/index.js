@@ -4,7 +4,8 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { lyrics, translate } from "./song.js";
-import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth.js";
+import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
+import { googleCallback, googleLogin } from "./auth/google.js";
 
 const PORT = 5000;
 
@@ -29,6 +30,10 @@ app.get("/auth/spotify/login", spotifyLogin);
 app.get("/auth/spotify/callback", spotifyCallback);
 
 app.get("/auth/spotify/token", spotifyToken);
+
+app.get("/auth/google/login", googleLogin);
+
+app.get("/auth/google/callback", googleCallback);
 
 app.get("/song/lyrics", lyrics);
 
