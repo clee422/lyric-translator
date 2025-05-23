@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { lyrics, translate } from "./song.js";
 import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
-import { googleCallback, googleLogin } from "./auth/google.js";
+import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
 
 const PORT = 5000;
 
@@ -34,6 +34,8 @@ app.get("/auth/spotify/token", spotifyToken);
 app.get("/auth/google/login", googleLogin);
 
 app.get("/auth/google/callback", googleCallback);
+
+app.get("/auth/google/token", googleToken);
 
 app.get("/song/lyrics", lyrics);
 

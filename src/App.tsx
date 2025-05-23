@@ -3,20 +3,31 @@ import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
 
 export default function App() {
-    const [token, setToken] = useState<string | undefined>(undefined);
+    const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
+        undefined
+    );
+    const [googleTokenAcquired, setGoogleTokenAcquired] =
+        useState<boolean>(false);
 
     useEffect(() => {
-        async function getToken() {
-            const response = await fetch("/auth/spotify/token");
-            const json = await response.json();
-            setToken(json.access_token);
+        async function getTokens() {
+            const spotifyRes = await fetch("/auth/spotify/token");
+            const spotifyJson = await spotifyRes.json();
+            setSpotifyToken(spotifyJson.access_token);
+            const googleRes = await fetch("/auth/google/token");
+            const googleJson = await googleRes.json();
+            setGoogleTokenAcquired(googleJson.tokenAcquired);
         }
-        getToken();
+        getTokens();
     }, []);
 
     return (
         <main className="app">
-            {token === undefined ? <Login /> : <WebPlayback token={token} />}
+            {spotifyToken === undefined || !googleTokenAcquired ? (
+                <Login />
+            ) : (
+                <WebPlayback token={spotifyToken} />
+            )}
         </main>
     );
 }

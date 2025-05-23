@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 export function googleLogin(req, res) {
     const generateRandomString = (length) => {
         const possible =
@@ -43,4 +45,10 @@ export async function googleCallback(req, res) {
     const tokenJson = await tokenRes.json();
     req.session.googleAccessToken = tokenJson.access_token;
     res.redirect("/");
+}
+
+export function googleToken(req, res) {
+    res.status(StatusCodes.OK).json({
+        tokenAcquired: req.session.googleAccessToken !== undefined,
+    });
 }
