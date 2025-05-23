@@ -226,7 +226,6 @@ export default function Lyrics({
     }
 
     function renderLyrics() {
-        console.log("render");
         if (!lyrics) {
             return null;
         }
