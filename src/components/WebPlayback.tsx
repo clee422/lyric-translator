@@ -7,10 +7,10 @@ export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
-    // const [position, setPosition] = useState<number>(0);
     const [showOriginalLyrics, setShowOriginalLyrics] = useState<boolean>(true);
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [showRomanization, setShowRomanization] = useState<boolean>(true);
+    const [followLyrics, setFollowLyrics] = useState<boolean>(true);
 
     // Period for playback position updates (in milliseconds)
     const pollingInterval: number = 200;
@@ -26,6 +26,10 @@ export default function WebPlayback({ token }: { token: string }) {
 
     function handleToggleRomanization() {
         setShowRomanization((prev) => !prev);
+    }
+
+    function handleToggleFollowLyrics() {
+        setFollowLyrics((prev) => !prev);
     }
 
     useEffect(() => {
@@ -108,6 +112,8 @@ export default function WebPlayback({ token }: { token: string }) {
                 showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
+                followLyrics={followLyrics}
+                stopFollowingLyrics={handleToggleFollowLyrics}
                 pollingInterval={pollingInterval}
             />
             <PlaybackControl
@@ -117,9 +123,11 @@ export default function WebPlayback({ token }: { token: string }) {
                 showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
+                followLyrics={followLyrics}
                 onToggleOriginalLyrics={handleToggleOriginalLyrics}
                 onToggleTranslation={handleToggleTranslation}
                 onToggleRomanization={handleToggleRomanization}
+                onToggleFollowLyrics={handleToggleFollowLyrics}
                 targetLanguage={targetLanguage}
                 pollingInterval={pollingInterval}
             />

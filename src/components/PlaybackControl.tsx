@@ -4,6 +4,8 @@ import {
     SkipNext,
     SkipPrevious,
     Translate,
+    Search,
+    SearchOff,
 } from "@mui/icons-material";
 import {
     alpha,
@@ -15,6 +17,7 @@ import {
     Slider,
     styled,
     Switch,
+    Tooltip,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusCodes } from "http-status-codes";
@@ -27,9 +30,11 @@ export default function PlaybackControl({
     showOriginalLyrics,
     showTranslation,
     showRomanization,
+    followLyrics,
     onToggleOriginalLyrics,
     onToggleTranslation,
     onToggleRomanization,
+    onToggleFollowLyrics,
     targetLanguage,
     pollingInterval,
 }: {
@@ -39,9 +44,11 @@ export default function PlaybackControl({
     showOriginalLyrics: boolean;
     showTranslation: boolean;
     showRomanization: boolean;
+    followLyrics: boolean;
     onToggleOriginalLyrics: any;
     onToggleTranslation: any;
     onToggleRomanization: any;
+    onToggleFollowLyrics: any;
     targetLanguage: string;
     pollingInterval: number;
 }) {
@@ -236,10 +243,26 @@ export default function PlaybackControl({
                         <SkipNext />
                     </button>
                 </div>
+                <div className="toggle-follow-lyrics">
+                    <Tooltip
+                        title={
+                            followLyrics
+                                ? "Stop following lyrics"
+                                : "Follow lyrics"
+                        }
+                    >
+                        <IconButton onClick={onToggleFollowLyrics}>
+                            {followLyrics ? <SearchOff /> : <Search />}
+                        </IconButton>
+                    </Tooltip>
+                </div>
                 <div className="toggle-translate">
-                    <IconButton onClick={handleClickTranslationMenu}>
-                        <Translate />
-                    </IconButton>
+                    <Tooltip title="Translate">
+                        <IconButton onClick={handleClickTranslationMenu}>
+                            <Translate />
+                        </IconButton>
+                    </Tooltip>
+
                     <Menu
                         anchorOrigin={{
                             vertical: "top",

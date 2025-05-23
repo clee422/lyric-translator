@@ -113,9 +113,20 @@ button.playback-control-change-track > svg {
     font-size: 2.5rem;
 }
 
+.toggle-follow-lyrics:hover {
+    background-color: var(--toggle-translate-hover-color);
+    border-radius: 1rem;
+}
+
+.toggle-follow-lyrics svg {
+    color: var(--playback-control-text-color);
+    opacity: 0.9;
+}
+
 .toggle-translate {
     display: flex;
     align-items: center;
+    margin-left: 0.5rem;
     margin-right: 1rem;
 }
 

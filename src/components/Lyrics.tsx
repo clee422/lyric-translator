@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { StatusCodes } from "http-status-codes";
 import { CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./Lyrics.css";
 
 export interface LyricLine {
@@ -24,6 +24,8 @@ export default function Lyrics({
     showOriginalLyrics,
     showTranslation,
     showRomanization,
+    followLyrics,
+    stopFollowingLyrics,
     pollingInterval,
 }: {
     webPlayer: Spotify.Player | undefined;
@@ -32,6 +34,8 @@ export default function Lyrics({
     showOriginalLyrics: boolean;
     showTranslation: boolean;
     showRomanization: boolean;
+    followLyrics: boolean;
+    stopFollowingLyrics: any;
     pollingInterval: number;
 }) {
     const [lyrics, setLyrics] = useState<LyricLine[]>();
@@ -40,6 +44,8 @@ export default function Lyrics({
     const [lyricSync, setLyricSync] = useState<boolean>();
     const [lyricsWidth, setLyricsWidth] = useState<number>();
     const [loading, setLoading] = useState<boolean>(true);
+
+    const currentLineRef = useRef<null | HTMLDivElement>(null);
 
     async function getTrackLyrics(
         stateCurrentTrack: Spotify.Track
@@ -254,6 +260,7 @@ export default function Lyrics({
                               }
                             : undefined
                     }
+                    ref={index === currentLine ? currentLineRef : null}
                 >
                     {/* Translated lyric */}
                     {showTranslation &&
@@ -327,6 +334,12 @@ export default function Lyrics({
                     return;
                 }
                 updateCurrentLine(state.position);
+                if (followLyrics && currentLineRef.current !== null) {
+                    currentLineRef.current.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }
             });
         }, pollingInterval);
 
