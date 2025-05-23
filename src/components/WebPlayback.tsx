@@ -1,251 +1,23 @@
 import { useState, useEffect } from "react";
-import { StatusCodes } from "http-status-codes";
 import Lyrics from "./Lyrics";
 import PlaybackControl from "./PlaybackControl";
 import "./WebPlayerback.css";
-
-export interface LyricLine {
-    // Time in ms
-    timestamp: number | undefined;
-    lyric: string;
-}
-
-export interface TranslationLine {
-    translatedText: string;
-    romanizedText: string;
-    // ISO 639 language code
-    detectedLanguage: string;
-}
 
 export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [position, setPosition] = useState<number>(0);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [lyrics, setLyrics] = useState<LyricLine[]>();
-    const [lyricLine, setLyricLine] = useState<number>();
-    const [translation, setTranslation] = useState<TranslationLine[]>();
     const [showOriginalLyrics, setShowOriginalLyrics] = useState<boolean>(true);
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [showRomanization, setShowRomanization] = useState<boolean>(true);
-    const [lyricSync, setLyricSync] = useState<boolean>();
 
     // Period for playback position updates (in milliseconds)
     const positionPollingRate: number = 200;
     const targetLanguage = "en";
 
-    function onTrackChange(stateCurrentTrack: Spotify.Track): void {
-        // Clear previous lyrics on track change
-        setLyrics([]);
-        setTranslation([]);
-        setLyricSync(false);
-        setLyricLine(undefined);
-        setLoading(true);
-
-        // Get and set current track lyrics and translations
-        setCurrentTrack(stateCurrentTrack);
-        getTrackLyrics(stateCurrentTrack).then((lyricsJson) => {
-            setTrackLyrics(lyricsJson);
-            translateLyrics(lyricsJson);
-            setLoading(false);
-        });
-    }
-
-    async function getTrackLyrics(
-        stateCurrentTrack: Spotify.Track
-    ): Promise<any> {
-        const queryParams = new URLSearchParams({
-            track_name: stateCurrentTrack.name,
-            artist_name: stateCurrentTrack.artists[0].name,
-            album_name: stateCurrentTrack.album.name,
-            duration: Math.floor(
-                stateCurrentTrack.duration_ms / 1000
-            ).toString(),
-        });
-
-        try {
-            return fetch(`/song/lyrics?${queryParams}`).then((res) => {
-                if (res.status == StatusCodes.OK) {
-                    return res.json();
-                } else if (res.status == StatusCodes.NOT_FOUND) {
-                    return undefined;
-                } else {
-                    console.error(
-                        `Attempted to fetch lyrics, response was status ${res.status}`
-                    );
-                    return undefined;
-                }
-            });
-        } catch (error) {
-            console.error(`Error fetching lyrics: ${error}`);
-            return undefined;
-        }
-    }
-
-    function setTrackLyrics(lyricsJson: any): void {
-        if (
-            !lyricsJson ||
-            !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
-        ) {
-            setLyrics(undefined);
-            setLyricSync(false);
-            return;
-        }
-
-        if (lyricsJson.syncedLyrics) {
-            const synced: string[] = lyricsJson.syncedLyrics
-                .split("\n")
-                .filter((line: string) =>
-                    /\[\d{2}:\d{2}.\d{2}\]\s*.+/.test(line)
-                );
-
-            // Use plain lyrics to determine linebreak for new verse
-            let syncedLyricsIndex = 0;
-            const plainLyricsSplit: string[] =
-                lyricsJson.plainLyrics.split("\n");
-
-            let newLyrics = plainLyricsSplit.map((line) => {
-                if (syncedLyricsIndex >= synced.length) {
-                    return {
-                        invalid: true,
-                        lyric: "",
-                        timestamp: undefined,
-                    };
-                }
-                if (!/\S+/.test(line)) {
-                    return {
-                        timestamp: undefined,
-                        lyric: "",
-                    };
-                }
-                const parts = /\[(\d{2}):(\d{2}).(\d{2})\]\s*(.+)/.exec(
-                    synced[syncedLyricsIndex]
-                );
-                syncedLyricsIndex += 1;
-                if (!parts) {
-                    return {
-                        invalid: true,
-                        lyric: "",
-                        timestamp: undefined,
-                    };
-                }
-                // Compute timestamp in ms
-                const timestamp =
-                    parseInt(parts[1]) * 60000 +
-                    parseInt(parts[2]) * 1000 +
-                    parseInt(parts[3]) * 10;
-                const lyric = parts[4];
-
-                return {
-                    lyric: lyric,
-                    timestamp: timestamp,
-                };
-            });
-            newLyrics = newLyrics.filter((line) =>
-                line.invalid ? false : true
-            );
-            setLyrics(newLyrics);
-            setLyricSync(true);
-        } else if (lyricsJson.plainLyrics) {
-            const split: string[] = lyricsJson.plainLyrics.split("\n");
-            setLyrics(
-                split.map((line) => ({
-                    timestamp: undefined,
-                    lyric: line,
-                }))
-            );
-            setLyricSync(false);
-        } else {
-            setLyrics(undefined);
-            setLyricSync(false);
-        }
-    }
-
-    function translateLyrics(lyricsJson: any): void {
-        if (
-            !lyricsJson ||
-            !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
-        ) {
-            return;
-        }
-        const lyrics: string[] = lyricsJson.plainLyrics
-            .split("\n")
-            .filter((line: string) => line !== "");
-        fetch("/song/translate", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                content: lyrics,
-                targetLanguage: targetLanguage,
-            }),
-        })
-            .then((res) => {
-                if (res.status == StatusCodes.OK) {
-                    res.json().then((json) =>
-                        setTranslation(json.translatedContent)
-                    );
-                } else {
-                    console.error(
-                        `Attempted to translate lyrics, response was status ${res.status}`
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error(`Error translating lyrics: ${error}`);
-            });
-    }
-
-    function updatePosition() {
-        webPlayer?.getCurrentState().then((state) => {
-            if (!state) {
-                return;
-            }
-
-            setPosition(state.position);
-
-            if (lyricSync) {
-                setLyricLine((prevLine) => {
-                    if (lyrics && lyrics[0].timestamp !== undefined) {
-                        if (state.position < lyrics[0].timestamp) {
-                            return undefined;
-                        }
-
-                        // Binary search to find current lyric. O(log(n)) time
-                        let l = 0;
-                        let r = lyrics.length - 1;
-                        let lyricLineIndex = 0;
-
-                        while (l <= r) {
-                            let m = Math.floor((l + r) / 2);
-                            if (lyrics[m].timestamp === undefined) {
-                                // If lyrics[m] is a verse break
-                                if (state.position < lyrics[m + 1].timestamp!) {
-                                    r = m - 1;
-                                } else {
-                                    l = m + 1;
-                                }
-                            } else if (state.position < lyrics[m].timestamp!) {
-                                r = m - 1;
-                            } else {
-                                lyricLineIndex = Math.max(lyricLineIndex, m);
-                                l = m + 1;
-                            }
-                        }
-                        return lyricLineIndex;
-                    }
-                    return prevLine;
-                });
-            }
-        });
-    }
-
-    function handleLyricClick(index: number) {
-        if (webPlayer && lyrics && lyrics[index].timestamp) {
-            webPlayer.seek(lyrics[index].timestamp);
-        }
+    function handleLyricClick(timestamp: number) {
+        webPlayer?.seek(timestamp);
     }
 
     function handleToggleOriginalLyrics() {
@@ -315,7 +87,7 @@ export default function WebPlayback({ token }: { token: string }) {
 
                     // On track change
                     if (prevTrack?.id !== stateCurrentTrack.id) {
-                        onTrackChange(stateCurrentTrack);
+                        setCurrentTrack(stateCurrentTrack);
                         return stateCurrentTrack;
                     }
                     return prevTrack;
@@ -333,29 +105,30 @@ export default function WebPlayback({ token }: { token: string }) {
 
     // Updating track position timer
     useEffect(() => {
-        const interval = setInterval(
-            () => updatePosition(),
-            positionPollingRate
-        );
+        const interval = setInterval(() => {
+            webPlayer?.getCurrentState().then((state) => {
+                if (!state) {
+                    return;
+                }
+                setPosition(state.position);
+            });
+        }, positionPollingRate);
 
         return () => {
             clearInterval(interval);
         };
-    }, [webPlayer, paused, lyrics, lyricLine, position]);
+    }, [webPlayer, position]);
 
     return (
         <div className="playback-container">
             <Lyrics
-                lyrics={lyrics}
-                currentLine={lyricLine}
+                currentTrack={currentTrack}
+                position={position}
                 onLyricClick={handleLyricClick}
-                loading={loading}
                 targetLanguage={targetLanguage}
-                translation={translation}
                 showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
-                lyricSync={lyricSync}
             />
             <PlaybackControl
                 currentTrack={currentTrack}

@@ -1,33 +1,249 @@
 import { clsx } from "clsx";
-import type { LyricLine, TranslationLine } from "./WebPlayback";
+import { StatusCodes } from "http-status-codes";
 import { CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import "./Lyrics.css";
 
+export interface LyricLine {
+    // Time in ms
+    timestamp: number | undefined;
+    lyric: string;
+}
+
+export interface TranslationLine {
+    translatedText: string;
+    romanizedText: string;
+    // ISO 639 language code
+    detectedLanguage: string;
+}
+
 export default function Lyrics({
-    lyrics,
-    currentLine,
+    currentTrack,
+    position,
     onLyricClick,
-    loading,
     targetLanguage,
-    translation,
     showOriginalLyrics,
     showTranslation,
     showRomanization,
-    lyricSync,
 }: {
-    lyrics: LyricLine[] | undefined;
-    currentLine: number | undefined;
+    currentTrack: Spotify.Track | undefined;
+    position: number;
     onLyricClick: any;
-    loading: boolean;
     targetLanguage: string;
-    translation: TranslationLine[] | undefined;
     showOriginalLyrics: boolean;
     showTranslation: boolean;
     showRomanization: boolean;
-    lyricSync: boolean | undefined;
 }) {
+    const [lyrics, setLyrics] = useState<LyricLine[]>();
+    const [translation, setTranslation] = useState<TranslationLine[]>();
+    const [currentLine, setCurrentLine] = useState<number>();
+    const [lyricSync, setLyricSync] = useState<boolean>();
     const [lyricsWidth, setLyricsWidth] = useState<number>();
+    const [loading, setLoading] = useState<boolean>(true);
+
+    async function getTrackLyrics(
+        stateCurrentTrack: Spotify.Track
+    ): Promise<any> {
+        const queryParams = new URLSearchParams({
+            track_name: stateCurrentTrack.name,
+            artist_name: stateCurrentTrack.artists[0].name,
+            album_name: stateCurrentTrack.album.name,
+            duration: Math.floor(
+                stateCurrentTrack.duration_ms / 1000
+            ).toString(),
+        });
+
+        try {
+            return fetch(`/song/lyrics?${queryParams}`).then((res) => {
+                if (res.status == StatusCodes.OK) {
+                    return res.json();
+                } else if (res.status == StatusCodes.NOT_FOUND) {
+                    return undefined;
+                } else {
+                    console.error(
+                        `Attempted to fetch lyrics, response was status ${res.status}`
+                    );
+                    return undefined;
+                }
+            });
+        } catch (error) {
+            console.error(`Error fetching lyrics: ${error}`);
+            return undefined;
+        }
+    }
+
+    function parseAndSetLyrics(lyricsJson: any): void {
+        if (
+            !lyricsJson ||
+            !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
+        ) {
+            setLyrics(undefined);
+            setLyricSync(false);
+            return;
+        }
+
+        if (lyricsJson.syncedLyrics) {
+            const synced: string[] = lyricsJson.syncedLyrics
+                .split("\n")
+                .filter((line: string) =>
+                    /\[\d{2}:\d{2}.\d{2}\]\s*.+/.test(line)
+                );
+
+            // Use plain lyrics to determine linebreak for new verse
+            let syncedLyricsIndex = 0;
+            const plainLyricsSplit: string[] =
+                lyricsJson.plainLyrics.split("\n");
+
+            let newLyrics = plainLyricsSplit.map((line) => {
+                if (syncedLyricsIndex >= synced.length) {
+                    return {
+                        invalid: true,
+                        lyric: "",
+                        timestamp: undefined,
+                    };
+                }
+                if (!/\S+/.test(line)) {
+                    return {
+                        timestamp: undefined,
+                        lyric: "",
+                    };
+                }
+                const parts = /\[(\d{2}):(\d{2}).(\d{2})\]\s*(.+)/.exec(
+                    synced[syncedLyricsIndex]
+                );
+                syncedLyricsIndex += 1;
+                if (!parts) {
+                    return {
+                        invalid: true,
+                        lyric: "",
+                        timestamp: undefined,
+                    };
+                }
+                // Compute timestamp in ms
+                const timestamp =
+                    parseInt(parts[1]) * 60000 +
+                    parseInt(parts[2]) * 1000 +
+                    parseInt(parts[3]) * 10;
+                const lyric = parts[4];
+
+                return {
+                    lyric: lyric,
+                    timestamp: timestamp,
+                };
+            });
+            newLyrics = newLyrics.filter((line) =>
+                line.invalid ? false : true
+            );
+            setLyrics(newLyrics);
+            setLyricSync(true);
+        } else if (lyricsJson.plainLyrics) {
+            const split: string[] = lyricsJson.plainLyrics.split("\n");
+            setLyrics(
+                split.map((line) => ({
+                    timestamp: undefined,
+                    lyric: line,
+                }))
+            );
+            setLyricSync(false);
+        } else {
+            setLyrics(undefined);
+            setLyricSync(false);
+        }
+    }
+
+    function translateLyrics(lyricsJson: any): void {
+        if (
+            !lyricsJson ||
+            !(lyricsJson.syncedLyrics || lyricsJson.plainLyrics)
+        ) {
+            return;
+        }
+        const lyrics: string[] = lyricsJson.plainLyrics
+            .split("\n")
+            .filter((line: string) => line !== "");
+        fetch("/song/translate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: lyrics,
+                targetLanguage: targetLanguage,
+            }),
+        })
+            .then((res) => {
+                if (res.status == StatusCodes.OK) {
+                    res.json().then((json) =>
+                        setTranslation(json.translatedContent)
+                    );
+                } else {
+                    console.error(
+                        `Attempted to translate lyrics, response was status ${res.status}`
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error(`Error translating lyrics: ${error}`);
+            });
+    }
+
+    // On track change
+    useEffect(() => {
+        // Clear previous lyrics on track change
+        setLyrics([]);
+        setTranslation([]);
+        setCurrentLine(undefined);
+        setLyricSync(false);
+        setLoading(true);
+
+        // Get and set current track lyrics and translations
+        if (currentTrack) {
+            getTrackLyrics(currentTrack).then((lyricsJson) => {
+                parseAndSetLyrics(lyricsJson);
+                translateLyrics(lyricsJson);
+                setLoading(false);
+            });
+        }
+    }, [currentTrack]);
+
+    // Update current line
+    useEffect(() => {
+        if (lyricSync) {
+            setCurrentLine((prevLine) => {
+                if (lyrics && lyrics[0].timestamp !== undefined) {
+                    if (position < lyrics[0].timestamp) {
+                        return undefined;
+                    }
+
+                    // Binary search to find current lyric. O(log(n)) time
+                    let l = 0;
+                    let r = lyrics.length - 1;
+                    let lyricLineIndex = 0;
+
+                    while (l <= r) {
+                        let m = Math.floor((l + r) / 2);
+                        if (lyrics[m].timestamp === undefined) {
+                            // If lyrics[m] is a verse break
+                            if (position < lyrics[m + 1].timestamp!) {
+                                r = m - 1;
+                            } else {
+                                l = m + 1;
+                            }
+                        } else if (position < lyrics[m].timestamp!) {
+                            r = m - 1;
+                        } else {
+                            lyricLineIndex = Math.max(lyricLineIndex, m);
+                            l = m + 1;
+                        }
+                    }
+                    return prevLine === lyricLineIndex
+                        ? prevLine
+                        : lyricLineIndex;
+                }
+                return prevLine;
+            });
+        }
+    }, [position]);
 
     // Calculate width of lyrics based on longest line
     useEffect(() => {
@@ -57,6 +273,7 @@ export default function Lyrics({
     ]);
 
     function renderLyrics() {
+        console.log("render");
         if (!lyrics) {
             return null;
         }
@@ -77,7 +294,11 @@ export default function Lyrics({
                 <div
                     key={index}
                     className={classNames}
-                    onClick={lyricSync ? () => onLyricClick(index) : undefined}
+                    onClick={
+                        lyricSync
+                            ? () => onLyricClick(line.timestamp)
+                            : undefined
+                    }
                 >
                     {/* Translated lyric */}
                     {showTranslation &&
