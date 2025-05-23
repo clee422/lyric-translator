@@ -1,26 +1,50 @@
-import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const oauth2Client = new OAuth2Client(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    "http://127.0.0.1:3000/auth/google/callback"
-);
-
 export function googleLogin(req, res) {
-    const authUrl = oauth2Client.generateAuthUrl({
+    const generateRandomString = (length) => {
+        const possible =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const values = crypto.getRandomValues(new Uint8Array(length));
+        return values.reduce(
+            (acc, x) => acc + possible[x % possible.length],
+            ""
+        );
+    };
+    const state = generateRandomString(16);
+    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    const authParams = new URLSearchParams({
         access_type: "offline",
         scope: "https://www.googleapis.com/auth/cloud-translation",
+        response_type: "code",
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        redirect_uri: "http://127.0.0.1:3000/auth/google/callback",
+        state: state,
     });
-    res.redirect(authUrl);
+    authUrl.search = authParams.toString();
+    res.redirect(authUrl.toString());
 }
 
 export async function googleCallback(req, res) {
     const { code } = req.query;
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-    req.session.googleAccessToken = tokens.access_token;
+    const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Basic ${new Buffer.from(
+                process.env.GOOGLE_CLIENT_ID +
+                    ":" +
+                    process.env.GOOGLE_CLIENT_SECRET
+            ).toString("base64")}`,
+        },
+        body: new URLSearchParams({
+            code: code,
+            redirect_uri: "http://127.0.0.1:3000/auth/google/callback",
+            grant_type: "authorization_code",
+        }),
+    });
+    const tokenJson = await tokenRes.json();
+    req.session.googleAccessToken = tokenJson.access_token;
     res.redirect("/");
 }
