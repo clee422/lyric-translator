@@ -113,7 +113,6 @@ export default function WebPlayback({ token }: { token: string }) {
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
                 followLyrics={followLyrics}
-                stopFollowingLyrics={handleToggleFollowLyrics}
                 pollingInterval={pollingInterval}
             />
             <PlaybackControl

@@ -25,7 +25,6 @@ export default function Lyrics({
     showTranslation,
     showRomanization,
     followLyrics,
-    stopFollowingLyrics,
     pollingInterval,
 }: {
     webPlayer: Spotify.Player | undefined;
@@ -35,7 +34,6 @@ export default function Lyrics({
     showTranslation: boolean;
     showRomanization: boolean;
     followLyrics: boolean;
-    stopFollowingLyrics: any;
     pollingInterval: number;
 }) {
     const [lyrics, setLyrics] = useState<LyricLine[]>();
