@@ -7,18 +7,14 @@ export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
-    const [position, setPosition] = useState<number>(0);
+    // const [position, setPosition] = useState<number>(0);
     const [showOriginalLyrics, setShowOriginalLyrics] = useState<boolean>(true);
     const [showTranslation, setShowTranslation] = useState<boolean>(true);
     const [showRomanization, setShowRomanization] = useState<boolean>(true);
 
     // Period for playback position updates (in milliseconds)
-    const positionPollingRate: number = 200;
+    const pollingInterval: number = 200;
     const targetLanguage = "en";
-
-    function handleLyricClick(timestamp: number) {
-        webPlayer?.seek(timestamp);
-    }
 
     function handleToggleOriginalLyrics() {
         setShowOriginalLyrics((prev) => !prev);
@@ -103,39 +99,21 @@ export default function WebPlayback({ token }: { token: string }) {
         };
     }, []);
 
-    // Updating track position timer
-    useEffect(() => {
-        const interval = setInterval(() => {
-            webPlayer?.getCurrentState().then((state) => {
-                if (!state) {
-                    return;
-                }
-                setPosition(state.position);
-            });
-        }, positionPollingRate);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [webPlayer, position]);
-
     return (
         <div className="playback-container">
             <Lyrics
+                webPlayer={webPlayer}
                 currentTrack={currentTrack}
-                position={position}
-                onLyricClick={handleLyricClick}
                 targetLanguage={targetLanguage}
                 showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
+                pollingInterval={pollingInterval}
             />
             <PlaybackControl
+                webPlayer={webPlayer}
                 currentTrack={currentTrack}
                 paused={paused}
-                position={position}
-                trackDuration={currentTrack?.duration_ms}
-                webPlayer={webPlayer}
                 showOriginalLyrics={showOriginalLyrics}
                 showTranslation={showTranslation}
                 showRomanization={showRomanization}
@@ -143,6 +121,7 @@ export default function WebPlayback({ token }: { token: string }) {
                 onToggleTranslation={handleToggleTranslation}
                 onToggleRomanization={handleToggleRomanization}
                 targetLanguage={targetLanguage}
+                pollingInterval={pollingInterval}
             />
         </div>
     );

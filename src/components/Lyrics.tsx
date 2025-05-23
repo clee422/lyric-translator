@@ -18,21 +18,21 @@ export interface TranslationLine {
 }
 
 export default function Lyrics({
+    webPlayer,
     currentTrack,
-    position,
-    onLyricClick,
     targetLanguage,
     showOriginalLyrics,
     showTranslation,
     showRomanization,
+    pollingInterval,
 }: {
+    webPlayer: Spotify.Player | undefined;
     currentTrack: Spotify.Track | undefined;
-    position: number;
-    onLyricClick: any;
     targetLanguage: string;
     showOriginalLyrics: boolean;
     showTranslation: boolean;
     showRomanization: boolean;
+    pollingInterval: number;
 }) {
     const [lyrics, setLyrics] = useState<LyricLine[]>();
     const [translation, setTranslation] = useState<TranslationLine[]>();
@@ -187,27 +187,7 @@ export default function Lyrics({
             });
     }
 
-    // On track change
-    useEffect(() => {
-        // Clear previous lyrics on track change
-        setLyrics([]);
-        setTranslation([]);
-        setCurrentLine(undefined);
-        setLyricSync(false);
-        setLoading(true);
-
-        // Get and set current track lyrics and translations
-        if (currentTrack) {
-            getTrackLyrics(currentTrack).then((lyricsJson) => {
-                parseAndSetLyrics(lyricsJson);
-                translateLyrics(lyricsJson);
-                setLoading(false);
-            });
-        }
-    }, [currentTrack]);
-
-    // Update current line
-    useEffect(() => {
+    function updateCurrentLine(position: number) {
         if (lyricSync) {
             setCurrentLine((prevLine) => {
                 if (lyrics && lyrics[0].timestamp !== undefined) {
@@ -243,34 +223,7 @@ export default function Lyrics({
                 return prevLine;
             });
         }
-    }, [position]);
-
-    // Calculate width of lyrics based on longest line
-    useEffect(() => {
-        let maxChars: number = 0;
-        if (showTranslation || showRomanization) {
-            translation?.forEach((line) => {
-                if (showTranslation) {
-                    maxChars = Math.max(maxChars, line.translatedText?.length);
-                }
-                if (showRomanization) {
-                    maxChars = Math.max(maxChars, line.romanizedText?.length);
-                }
-            });
-        }
-        if (showOriginalLyrics) {
-            lyrics?.forEach(
-                (line) => (maxChars = Math.max(maxChars, line.lyric.length))
-            );
-        }
-        setLyricsWidth(maxChars * 0.65);
-    }, [
-        showOriginalLyrics,
-        showTranslation,
-        showRomanization,
-        lyrics,
-        translation,
-    ]);
+    }
 
     function renderLyrics() {
         console.log("render");
@@ -296,7 +249,10 @@ export default function Lyrics({
                     className={classNames}
                     onClick={
                         lyricSync
-                            ? () => onLyricClick(line.timestamp)
+                            ? () => {
+                                  if (line.timestamp)
+                                      handleLyricClick(line.timestamp);
+                              }
                             : undefined
                     }
                 >
@@ -340,6 +296,72 @@ export default function Lyrics({
 
         return lyricElements;
     }
+
+    function handleLyricClick(timestamp: number) {
+        webPlayer?.seek(timestamp);
+    }
+
+    // On track change
+    useEffect(() => {
+        // Clear previous lyrics on track change
+        setLyrics([]);
+        setTranslation([]);
+        setCurrentLine(undefined);
+        setLyricSync(false);
+        setLoading(true);
+
+        // Get and set current track lyrics and translations
+        if (currentTrack) {
+            getTrackLyrics(currentTrack).then((lyricsJson) => {
+                parseAndSetLyrics(lyricsJson);
+                translateLyrics(lyricsJson);
+                setLoading(false);
+            });
+        }
+    }, [currentTrack]);
+
+    // Interval for updating current line
+    useEffect(() => {
+        const interval = setInterval(() => {
+            webPlayer?.getCurrentState().then((state) => {
+                if (!state) {
+                    return;
+                }
+                updateCurrentLine(state.position);
+            });
+        }, pollingInterval);
+
+        return () => {
+            clearInterval(interval);
+        };
+    });
+
+    // Calculate width of lyrics based on longest line
+    useEffect(() => {
+        let maxChars: number = 0;
+        if (showTranslation || showRomanization) {
+            translation?.forEach((line) => {
+                if (showTranslation) {
+                    maxChars = Math.max(maxChars, line.translatedText?.length);
+                }
+                if (showRomanization) {
+                    maxChars = Math.max(maxChars, line.romanizedText?.length);
+                }
+            });
+        }
+        if (showOriginalLyrics) {
+            lyrics?.forEach(
+                (line) => (maxChars = Math.max(maxChars, line.lyric.length))
+            );
+        }
+        setLyricsWidth(maxChars * 0.65);
+    }, [
+        showOriginalLyrics,
+        showTranslation,
+        showRomanization,
+        lyrics,
+        translation,
+    ]);
 
     return (
         <div className="lyrics-container">

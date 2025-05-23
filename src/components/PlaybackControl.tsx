@@ -21,11 +21,9 @@ import { StatusCodes } from "http-status-codes";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({
+    webPlayer,
     currentTrack,
     paused,
-    position,
-    trackDuration,
-    webPlayer,
     showOriginalLyrics,
     showTranslation,
     showRomanization,
@@ -33,12 +31,11 @@ export default function PlaybackControl({
     onToggleTranslation,
     onToggleRomanization,
     targetLanguage,
+    pollingInterval,
 }: {
+    webPlayer: Spotify.Player | undefined;
     currentTrack: Spotify.Track | undefined;
     paused: boolean | undefined;
-    position: number;
-    trackDuration: number | undefined;
-    webPlayer: Spotify.Player | undefined;
     showOriginalLyrics: boolean;
     showTranslation: boolean;
     showRomanization: boolean;
@@ -46,14 +43,17 @@ export default function PlaybackControl({
     onToggleTranslation: any;
     onToggleRomanization: any;
     targetLanguage: string;
+    pollingInterval: number;
 }) {
-    const [anchorEl, setAnchorElem] = useState<null | HTMLElement>(null);
+    const [position, setPosition] = useState<number>(0);
     const [translateTrackName, setTranslateTrackName] =
         useState<boolean>(false);
     const [trackNameTranslation, setTrackNameTranslation] = useState<
         string | undefined
     >();
+    const [anchorEl, setAnchorElem] = useState<null | HTMLElement>(null);
 
+    const trackDuration = currentTrack?.duration_ms;
     const open = Boolean(anchorEl);
 
     const LyricSwitch = styled(Switch)(({ theme }) => {
@@ -103,14 +103,6 @@ export default function PlaybackControl({
         }
     }
 
-    // On track change
-    useEffect(() => {
-        // Show original song name by default
-        setTrackNameTranslation(undefined);
-        setTranslateTrackName(false);
-        translateTrackInfo(currentTrack?.name);
-    }, [currentTrack]);
-
     function handleToggleTrackName() {
         if (trackNameTranslation) {
             setTranslateTrackName((prev) => !prev);
@@ -126,6 +118,29 @@ export default function PlaybackControl({
     function handleCloseTranslationMenu() {
         setAnchorElem(null);
     }
+
+    // On track change
+    useEffect(() => {
+        // Show original song name by default
+        setTrackNameTranslation(undefined);
+        setTranslateTrackName(false);
+        translateTrackInfo(currentTrack?.name);
+    }, [currentTrack]);
+
+    // Interval for updated current position
+    useEffect(() => {
+        const interval = setInterval(() => {
+            webPlayer?.getCurrentState().then((state) => {
+                if (!state) {
+                    return;
+                }
+                setPosition(state.position);
+            });
+        }, pollingInterval);
+        return () => {
+            clearInterval(interval);
+        };
+    });
 
     return (
         <footer className="app-footer">
