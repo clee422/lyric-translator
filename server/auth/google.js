@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
 export function googleLogin(req, res) {
     const generateRandomString = (length) => {
         const possible =
