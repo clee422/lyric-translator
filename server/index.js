@@ -3,6 +3,7 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import MongoStore from "connect-mongo";
 import { lyrics, translate } from "./song.js";
 import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
 import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
@@ -10,6 +11,7 @@ import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
 const PORT = 5000;
 
 dotenv.config();
+
 const app = express();
 app.use(bodyParser.json());
 app.use(
@@ -17,6 +19,11 @@ app.use(
         secret: crypto.randomBytes(32).toString("hex"),
         resave: false,
         saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI,
+            collectionName: "sessions",
+            ttl: 3600000, // Session life (1 hour)
+        }),
         cookie: {
             httpOnly: true,
             secure: false, // Set to true if using HTTPS
@@ -25,6 +32,7 @@ app.use(
     })
 );
 
+// Routes
 app.get("/auth/spotify/login", spotifyLogin);
 
 app.get("/auth/spotify/callback", spotifyCallback);
