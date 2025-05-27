@@ -53,15 +53,13 @@ export async function spotifyCallback(req, res) {
         const tokenJson = await tokenResponse.json();
         req.session.spotifyAccessToken = tokenJson.access_token;
 
-        res.redirect("/auth/google/login");
+        res.redirect(
+            `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/google/login`
+        );
     }
 }
 
 export async function spotifyToken(req, res) {
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
     res.json({
         access_token: req.session.spotifyAccessToken,
     });
