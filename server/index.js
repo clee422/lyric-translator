@@ -21,7 +21,7 @@ app.use(
 );
 app.use(
     session({
-        secret: crypto.randomBytes(32).toString("hex"),
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
