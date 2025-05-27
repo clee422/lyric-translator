@@ -17,7 +17,7 @@ export function googleLogin(req, res) {
         scope: "https://www.googleapis.com/auth/cloud-translation",
         response_type: "code",
         client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: "http://127.0.0.1:3000/auth/google/callback",
+        redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/google/callback`,
         state: state,
     });
     authUrl.search = authParams.toString();
@@ -38,13 +38,13 @@ export async function googleCallback(req, res) {
         },
         body: new URLSearchParams({
             code: code,
-            redirect_uri: "http://127.0.0.1:3000/auth/google/callback",
+            redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/google/callback`,
             grant_type: "authorization_code",
         }),
     });
     const tokenJson = await tokenRes.json();
     req.session.googleAccessToken = tokenJson.access_token;
-    res.redirect("/");
+    res.redirect(`${process.env.APP_CLIENT_URL}`);
 }
 
 export function googleToken(req, res) {

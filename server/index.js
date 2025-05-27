@@ -1,6 +1,7 @@
 import express from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import MongoStore from "connect-mongo";
@@ -8,12 +9,15 @@ import { lyrics, translate } from "./song.js";
 import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
 import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
 
-const PORT = 5000;
-
 dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
+app.use(
+    cors({
+        origin: process.env.APP_CLIENT_URL,
+        credentials: true,
+    })
+);
 app.use(
     session({
         secret: crypto.randomBytes(32).toString("hex"),
@@ -31,6 +35,7 @@ app.use(
         },
     })
 );
+app.use(bodyParser.json());
 
 // Routes
 app.get("/auth/spotify/login", spotifyLogin);
@@ -49,6 +54,8 @@ app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
 
-app.listen(PORT, () => {
-    console.log(`Server started at http://127.0.0.1:${PORT}`);
+app.listen(process.env.APP_SERVER_PORT, () => {
+    console.log(
+        `Server started at ${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}`
+    );
 });

@@ -7,15 +7,5 @@ export default defineConfig({
     server: {
         host: "127.0.0.1",
         port: 3000,
-        proxy: {
-            "/auth": {
-                target: "http://127.0.0.1:5000",
-                changeOrigin: true,
-            },
-            "/song": {
-                target: "http://127.0.0.1:5000",
-                changeOrigin: true,
-            },
-        },
     },
 });

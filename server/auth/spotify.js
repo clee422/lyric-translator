@@ -16,7 +16,7 @@ export async function spotifyLogin(req, res) {
         response_type: "code",
         client_id: process.env.SPOTIFY_CLIENT_ID,
         scope: "streaming user-read-email user-read-private",
-        redirect_uri: "http://127.0.0.1:3000/auth/spotify/callback",
+        redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/spotify/callback`,
         state: state,
     });
 
@@ -45,7 +45,7 @@ export async function spotifyCallback(req, res) {
                 },
                 body: new URLSearchParams({
                     code: code,
-                    redirect_uri: "http://127.0.0.1:3000/auth/spotify/callback",
+                    redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/spotify/callback`,
                     grant_type: "authorization_code",
                 }),
             }
@@ -58,7 +58,6 @@ export async function spotifyCallback(req, res) {
 }
 
 export async function spotifyToken(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:3000");
     res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"

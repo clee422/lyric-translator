@@ -86,16 +86,20 @@ export default function PlaybackControl({
         if (!trackName) {
             return;
         }
-        const translationRes = await fetch("/song/translate", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                content: [trackName],
-                targetLanguage: targetLanguage,
-            }),
-        });
+        const translationRes = await fetch(
+            `${import.meta.env.VITE_APP_SERVER_URL}/song/translate`,
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    content: [trackName],
+                    targetLanguage: targetLanguage,
+                }),
+            }
+        );
         if (translationRes.status == StatusCodes.OK) {
             translationRes.json().then((json) => {
                 const [translatedContent] = json.translatedContent;

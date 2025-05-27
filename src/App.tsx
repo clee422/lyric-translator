@@ -11,10 +11,22 @@ export default function App() {
 
     useEffect(() => {
         async function getTokens() {
-            const spotifyRes = await fetch("/auth/spotify/token");
+            const spotifyRes = await fetch(
+                `${import.meta.env.VITE_APP_SERVER_URL}/auth/spotify/token`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
             const spotifyJson = await spotifyRes.json();
             setSpotifyToken(spotifyJson.access_token);
-            const googleRes = await fetch("/auth/google/token");
+            const googleRes = await fetch(
+                `${import.meta.env.VITE_APP_SERVER_URL}/auth/google/token`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
             const googleJson = await googleRes.json();
             setGoogleTokenAcquired(googleJson.tokenAcquired);
         }

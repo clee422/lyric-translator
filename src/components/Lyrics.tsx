@@ -58,7 +58,15 @@ export default function Lyrics({
         });
 
         try {
-            return fetch(`/song/lyrics?${queryParams}`).then((res) => {
+            return fetch(
+                `${
+                    import.meta.env.VITE_APP_SERVER_URL
+                }/song/lyrics?${queryParams}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            ).then((res) => {
                 if (res.status == StatusCodes.OK) {
                     return res.json();
                 } else if (res.status == StatusCodes.NOT_FOUND) {
@@ -165,8 +173,9 @@ export default function Lyrics({
         const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "");
-        fetch("/song/translate", {
+        fetch(`${import.meta.env.VITE_APP_SERVER_URL}/song/translate`, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
