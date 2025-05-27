@@ -59,7 +59,9 @@ export default function Lyrics({
 
         try {
             return fetch(
-                `${process.env.VITE_APP_SERVER_URL}/song/lyrics?${queryParams}`,
+                `${
+                    import.meta.env.VITE_APP_SERVER_URL
+                }/song/lyrics?${queryParams}`,
                 {
                     method: "GET",
                     credentials: "include",
@@ -171,7 +173,7 @@ export default function Lyrics({
         const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "");
-        fetch(`${process.env.VITE_APP_SERVER_URL}/song/translate`, {
+        fetch(`${import.meta.env.VITE_APP_SERVER_URL}/song/translate`, {
             method: "POST",
             credentials: "include",
             headers: {
