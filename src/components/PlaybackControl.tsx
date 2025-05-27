@@ -87,7 +87,7 @@ export default function PlaybackControl({
             return;
         }
         const translationRes = await fetch(
-            `${import.meta.env.VITE_APP_SERVER_URL}/song/translate`,
+            `${process.env.VITE_APP_SERVER_URL}/song/translate`,
             {
                 method: "POST",
                 credentials: "include",
