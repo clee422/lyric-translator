@@ -11,6 +11,7 @@ import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
 
 dotenv.config();
 
+const PORT = process.env.PORT;
 const app = express();
 app.use(
     cors({
@@ -55,8 +56,8 @@ app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
 
-app.listen(process.env.APP_SERVER_PORT, () => {
+app.listen(PORT, () => {
     console.log(
-        `Server started at ${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}`
+        `Server started at ${process.env.APP_SERVER_URL} on port ${PORT}`
     );
 });

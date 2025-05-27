@@ -17,7 +17,7 @@ export function googleLogin(req, res) {
         scope: "https://www.googleapis.com/auth/cloud-translation",
         response_type: "code",
         client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/google/callback`,
+        redirect_uri: `${process.env.APP_SERVER_URL}/auth/google/callback`,
         state: state,
     });
     authUrl.search = authParams.toString();
@@ -38,7 +38,7 @@ export async function googleCallback(req, res) {
         },
         body: new URLSearchParams({
             code: code,
-            redirect_uri: `${process.env.APP_SERVER_URL}:${process.env.APP_SERVER_PORT}/auth/google/callback`,
+            redirect_uri: `${process.env.APP_SERVER_URL}/auth/google/callback`,
             grant_type: "authorization_code",
         }),
     });
