@@ -3,7 +3,6 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import crypto from "crypto";
 import MongoStore from "connect-mongo";
 import { lyrics, translate } from "./song.js";
 import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
@@ -15,7 +14,8 @@ const PORT = process.env.PORT;
 const app = express();
 app.use(
     cors({
-        origin: process.env.APP_CLIENT_URL,
+        // origin: process.env.APP_CLIENT_URL,
+        origin: "https://lyric-translator.vercel.app",
         credentials: true,
     })
 );
@@ -55,6 +55,13 @@ app.get("/auth/google/token", googleToken);
 app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
+
+app.get("/test-session", (req, res) => {
+    req.session.foo = "bar";
+    res.json({
+        sessionID: req.sessionID,
+    });
+});
 
 app.listen(PORT, () => {
     console.log(
