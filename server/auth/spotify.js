@@ -52,6 +52,7 @@ export async function spotifyCallback(req, res) {
         );
         const tokenJson = await tokenResponse.json();
         req.session.spotifyAccessToken = tokenJson.access_token;
+        console.log(`setting token: ${req.sessionID}`);
         req.session.save(() => {
             res.redirect(`${process.env.APP_CLIENT_URL}/continue-auth`);
         });
@@ -59,6 +60,8 @@ export async function spotifyCallback(req, res) {
 }
 
 export async function spotifyToken(req, res) {
+    console.log(`getting token: ${req.sessionID}`);
+    console.log(`token: ${JSON.stringify(req.session)}`);
     res.json({
         access_token: req.session.spotifyAccessToken,
     });
