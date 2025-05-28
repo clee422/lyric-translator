@@ -53,7 +53,7 @@ export async function spotifyCallback(req, res) {
         const tokenJson = await tokenResponse.json();
         req.session.spotifyAccessToken = tokenJson.access_token;
         req.session.save(() => {
-            res.redirect(`${process.env.APP_SERVER_URL}/auth/google/login`);
+            res.redirect(`${process.env.APP_CLIENT_URL}/continue-auth`);
         });
     }
 }

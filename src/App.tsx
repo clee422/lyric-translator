@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router";
 import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
+import ContinueOAuth from "./components/ContinueOAuth";
 
 export default function App() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
@@ -34,12 +36,23 @@ export default function App() {
     }, []);
 
     return (
-        <main className="app">
-            {spotifyToken === undefined || !googleTokenAcquired ? (
-                <Login />
-            ) : (
-                <WebPlayback token={spotifyToken} />
-            )}
-        </main>
+        <BrowserRouter>
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <main className="app">
+                            {spotifyToken === undefined ||
+                            !googleTokenAcquired ? (
+                                <Login />
+                            ) : (
+                                <WebPlayback token={spotifyToken} />
+                            )}
+                        </main>
+                    }
+                />
+                <Route path="/continue-auth" element={<ContinueOAuth />} />
+            </Routes>
+        </BrowserRouter>
     );
 }
