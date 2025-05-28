@@ -57,6 +57,7 @@ app.post("/song/translate", translate);
 
 app.get("/test-session", (req, res) => {
     req.session.foo = "bar";
+    res.cookie("test-cookie", Math.floor(Math.random() * 10));
     res.json({
         sessionID: req.sessionID,
     });
