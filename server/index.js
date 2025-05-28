@@ -12,6 +12,7 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 const app = express();
+app.set("trust proxy", 1);
 app.use(
     cors({
         origin: process.env.APP_CLIENT_URL,
@@ -33,6 +34,7 @@ app.use(
             sameSite: process.env.NODE_ENV === "production" ? "none" : false,
             secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
             maxAge: 3600000, // 1 hour
+            domain: ".vercel.app",
         },
     })
 );
@@ -57,7 +59,6 @@ app.post("/song/translate", translate);
 
 app.get("/test-session", (req, res) => {
     req.session.foo = "bar";
-    res.cookie("test-cookie", Math.floor(Math.random() * 10));
     res.json({
         sessionID: req.sessionID,
     });
