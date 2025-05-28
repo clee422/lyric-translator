@@ -14,8 +14,7 @@ const PORT = process.env.PORT;
 const app = express();
 app.use(
     cors({
-        // origin: process.env.APP_CLIENT_URL,
-        origin: "https://lyric-translator.vercel.app",
+        origin: process.env.APP_CLIENT_URL,
         credentials: true,
     })
 );
