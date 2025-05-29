@@ -31,13 +31,6 @@ export default function App() {
             );
             const googleJson = await googleRes.json();
             setGoogleTokenAcquired(googleJson.tokenAcquired);
-
-            // Test cookie being sent
-            fetch(`${import.meta.env.VITE_APP_SERVER_URL}/test-session`, {
-                credentials: "include",
-            })
-                .then((res) => res.json())
-                .then(console.log);
         }
         getTokens();
     }, []);

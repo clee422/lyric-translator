@@ -11,20 +11,6 @@ export default function Login() {
             >
                 Login
             </a>
-            <button
-                onClick={() => {
-                    fetch(
-                        `${import.meta.env.VITE_APP_SERVER_URL}/test-session`,
-                        {
-                            credentials: "include",
-                        }
-                    )
-                        .then((res) => res.json())
-                        .then(console.log);
-                }}
-            >
-                SessionID
-            </button>
         </div>
     );
 }

@@ -56,13 +56,6 @@ app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
 
-app.get("/test-session", (req, res) => {
-    req.session.foo = "bar";
-    res.json({
-        sessionID: req.sessionID,
-    });
-});
-
 app.listen(PORT, () => {
     console.log(
         `Server started at ${process.env.APP_SERVER_URL} on port ${PORT}`
