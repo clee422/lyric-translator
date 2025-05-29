@@ -34,7 +34,6 @@ app.use(
             sameSite: process.env.NODE_ENV === "production" ? "none" : false,
             secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
             maxAge: 3600000, // 1 hour
-            domain: ".vercel.app",
         },
     })
 );
