@@ -3,6 +3,8 @@ import {
     PauseCircle,
     SkipNext,
     SkipPrevious,
+    VolumeUp,
+    VolumeOff,
     Translate,
     Search,
     SearchOff,
@@ -53,6 +55,8 @@ export default function PlaybackControl({
     pollingInterval: number;
 }) {
     const [position, setPosition] = useState<number>(0);
+    const [volume, setVolume] = useState<number>(25);
+    const [prevVolume, setPrevVolume] = useState<number>(0);
     const [translateTrackName, setTranslateTrackName] =
         useState<boolean>(false);
     const [trackNameTranslation, setTrackNameTranslation] = useState<
@@ -130,6 +134,17 @@ export default function PlaybackControl({
         setAnchorElem(null);
     }
 
+    function handleToggleMute() {
+        if (volume === 0) {
+            webPlayer?.setVolume(prevVolume / 100);
+            setVolume(prevVolume);
+        } else {
+            setPrevVolume(volume);
+            webPlayer?.setVolume(0);
+            setVolume(0);
+        }
+    }
+
     // On track change
     useEffect(() => {
         // Show original song name by default
@@ -147,6 +162,7 @@ export default function PlaybackControl({
                 }
                 setPosition(state.position);
             });
+            webPlayer?.getVolume().then((val) => setVolume(val * 100));
         }, pollingInterval);
         return () => {
             clearInterval(interval);
@@ -247,90 +263,129 @@ export default function PlaybackControl({
                         <SkipNext />
                     </button>
                 </div>
-                <div className="toggle-follow-lyrics">
-                    <Tooltip
-                        title={
-                            followLyrics
-                                ? "Stop following lyrics"
-                                : "Follow lyrics"
-                        }
-                    >
-                        <IconButton onClick={onToggleFollowLyrics}>
-                            {followLyrics ? <SearchOff /> : <Search />}
-                        </IconButton>
-                    </Tooltip>
-                </div>
-                <div className="toggle-translate">
-                    <Tooltip title="Translate">
-                        <IconButton onClick={handleClickTranslationMenu}>
-                            <Translate />
-                        </IconButton>
-                    </Tooltip>
+                <div className="playback-features">
+                    <div className="toggle-follow-lyrics">
+                        <Tooltip
+                            title={
+                                followLyrics
+                                    ? "Stop following lyrics"
+                                    : "Follow lyrics"
+                            }
+                        >
+                            <IconButton onClick={onToggleFollowLyrics}>
+                                {followLyrics ? <SearchOff /> : <Search />}
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                    <div className="toggle-translate">
+                        <Tooltip title="Translate">
+                            <IconButton onClick={handleClickTranslationMenu}>
+                                <Translate />
+                            </IconButton>
+                        </Tooltip>
 
-                    <Menu
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                        transformOrigin={{
-                            vertical: "bottom",
-                            horizontal: "right",
-                        }}
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleCloseTranslationMenu}
-                        sx={{
-                            ".MuiPaper-root": {
-                                color: "white",
-                                backgroundColor: "#1E1E1E",
-                            },
-                            ".MuiMenuItem-root:hover": {
-                                backgroundColor: "#2D2D2D",
-                            },
-                            ".MuiFormControlLabel-label": {
-                                fontFamily: `"Inter", sans-serif`,
-                                fontWeight: "300",
-                                marginLeft: "0.5rem",
-                            },
-                        }}
-                    >
-                        <FormGroup>
-                            <MenuItem>
-                                <FormControlLabel
-                                    control={
-                                        <LyricSwitch
-                                            checked={showOriginalLyrics}
-                                            onChange={onToggleOriginalLyrics}
-                                            color="default"
-                                        />
-                                    }
-                                    label="Original Lyrics"
-                                />
-                            </MenuItem>
-                            <MenuItem>
-                                <FormControlLabel
-                                    control={
-                                        <LyricSwitch
-                                            checked={showTranslation}
-                                            onChange={onToggleTranslation}
-                                        />
-                                    }
-                                    label="Translation"
-                                />
-                            </MenuItem>
-                            <MenuItem>
-                                <FormControlLabel
-                                    control={
-                                        <LyricSwitch
-                                            checked={showRomanization}
-                                            onChange={onToggleRomanization}
-                                        />
-                                    }
-                                    label="Romanization"
-                                />
-                            </MenuItem>
-                        </FormGroup>
-                    </Menu>
+                        <Menu
+                            anchorOrigin={{
+                                vertical: "top",
+                                horizontal: "right",
+                            }}
+                            transformOrigin={{
+                                vertical: "bottom",
+                                horizontal: "center",
+                            }}
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleCloseTranslationMenu}
+                            sx={{
+                                ".MuiPaper-root": {
+                                    color: "white",
+                                    backgroundColor: "#1E1E1E",
+                                },
+                                ".MuiMenuItem-root:hover": {
+                                    backgroundColor: "#2D2D2D",
+                                },
+                                ".MuiFormControlLabel-label": {
+                                    fontFamily: `"Inter", sans-serif`,
+                                    fontWeight: "300",
+                                    marginLeft: "0.5rem",
+                                },
+                            }}
+                        >
+                            <FormGroup>
+                                <MenuItem>
+                                    <FormControlLabel
+                                        control={
+                                            <LyricSwitch
+                                                checked={showOriginalLyrics}
+                                                onChange={
+                                                    onToggleOriginalLyrics
+                                                }
+                                                color="default"
+                                            />
+                                        }
+                                        label="Original Lyrics"
+                                    />
+                                </MenuItem>
+                                <MenuItem>
+                                    <FormControlLabel
+                                        control={
+                                            <LyricSwitch
+                                                checked={showTranslation}
+                                                onChange={onToggleTranslation}
+                                            />
+                                        }
+                                        label="Translation"
+                                    />
+                                </MenuItem>
+                                <MenuItem>
+                                    <FormControlLabel
+                                        control={
+                                            <LyricSwitch
+                                                checked={showRomanization}
+                                                onChange={onToggleRomanization}
+                                            />
+                                        }
+                                        label="Romanization"
+                                    />
+                                </MenuItem>
+                            </FormGroup>
+                        </Menu>
+                    </div>
+                    <div className="playback-volume-control">
+                        <Tooltip title={volume === 0 ? "Unmute" : "Mute"}>
+                            <IconButton onClick={handleToggleMute}>
+                                {volume === 0 ? <VolumeOff /> : <VolumeUp />}
+                            </IconButton>
+                        </Tooltip>
+                        <Slider
+                            size="small"
+                            value={volume}
+                            min={0}
+                            max={100}
+                            sx={() => ({
+                                color: "rgb(200, 200, 200)",
+                                "& .MuiSlider-thumb": {
+                                    width: 0,
+                                    height: 0,
+                                    transition:
+                                        "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                                    "&:hover, &.Mui-focusVisible": {
+                                        boxShadow: "none",
+                                        width: 8,
+                                        height: 8,
+                                    },
+                                    "&.Mui-active": {
+                                        width: 12,
+                                        height: 12,
+                                    },
+                                },
+                            })}
+                            onChange={(_, value) => {
+                                webPlayer?.setVolume(value / 100);
+                                setVolume(value);
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </footer>

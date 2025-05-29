@@ -113,29 +113,27 @@ button.playback-control-change-track > svg {
     font-size: 2.5rem;
 }
 
-.toggle-follow-lyrics:hover {
+div.playback-features {
+    display: flex;
+    margin-right: 1.5rem;
+}
+
+div.playback-features button:hover {
     background-color: var(--toggle-translate-hover-color);
     border-radius: 1rem;
 }
 
-.toggle-follow-lyrics svg {
+div.playback-features svg {
     color: var(--playback-control-text-color);
     opacity: 0.9;
 }
 
-.toggle-translate {
+div.playback-volume-control {
     display: flex;
     align-items: center;
-    margin-left: 0.5rem;
-    margin-right: 1rem;
 }
 
-.toggle-translate:hover {
-    background-color: var(--toggle-translate-hover-color);
-    border-radius: 1rem;
-}
-
-.toggle-translate svg {
-    color: var(--playback-control-text-color);
-    opacity: 0.9;
+div.playback-volume-control .MuiSlider-root {
+    width: 5rem;
+    height: 4px;
 }
