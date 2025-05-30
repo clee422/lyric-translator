@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Lyrics from "./Lyrics";
 import PlaybackControl from "./PlaybackControl";
-import "./WebPlayerback.css";
+import "./WebPlayback.css";
 
 export default function WebPlayback({ token }: { token: string }) {
     const [webPlayer, setWebPlayer] = useState<Spotify.Player>();
