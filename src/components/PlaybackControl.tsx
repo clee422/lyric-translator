@@ -190,7 +190,7 @@ export default function PlaybackControl({
                 value={position}
                 min={0}
                 max={trackDuration}
-                step={1}
+                step={1000}
                 sx={(t) => ({
                     color: "rgb(200, 200, 200)",
                     "& .MuiSlider-thumb": {
@@ -377,6 +377,7 @@ export default function PlaybackControl({
                             value={volume}
                             min={0}
                             max={100}
+                            step={1}
                             sx={() => ({
                                 color: "rgb(200, 200, 200)",
                                 "& .MuiSlider-thumb": {
