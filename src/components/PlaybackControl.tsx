@@ -86,6 +86,19 @@ export default function PlaybackControl({
         };
     });
 
+    function formatTimestamp(timestamp: number) {
+        if (!trackDuration) {
+            return null;
+        }
+        const currentMins = Math.floor(timestamp / 60000);
+        let currentSecs = Math.floor((timestamp % 60000) / 1000).toString();
+        if (currentSecs.length < 2) currentSecs = "0" + currentSecs;
+        const totalMins = Math.floor(trackDuration / 60000);
+        let totalSecs = Math.floor((trackDuration % 60000) / 1000).toString();
+        if (totalSecs.length < 2) totalSecs = "0" + totalSecs;
+        return `${currentMins}:${currentSecs} / ${totalMins}:${totalSecs}`;
+    }
+
     async function translateTrackInfo(trackName: string | undefined) {
         if (!trackName) {
             return;
@@ -201,6 +214,8 @@ export default function PlaybackControl({
                 onChange={(_, value) => {
                     webPlayer?.seek(value);
                 }}
+                valueLabelDisplay="auto"
+                valueLabelFormat={formatTimestamp}
             />
             <div className="playback-control">
                 <div className="current-track">
@@ -384,6 +399,7 @@ export default function PlaybackControl({
                                 webPlayer?.setVolume(value / 100);
                                 setVolume(value);
                             }}
+                            valueLabelDisplay="auto"
                         />
                     </div>
                 </div>
