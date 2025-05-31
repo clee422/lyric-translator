@@ -27,20 +27,19 @@ const chineseLanguageCodes = new Set(["zh-CN", "zh-TW", "zh-HK", "zh-SG"]);
 //     ...
 // ]
 export async function lyrics(req, res) {
-    const queryParams = req.url.split("?")[1];
-    const fetchLyricRes = await fetch(
-        `https://lrclib.net/api/get?${queryParams}`,
-        {
-            headers: {
-                "User-Agent": `${process.env.npm_package_name} v${process.env.npm_package_version} ${process.env.PROJECT_REPO_URL}`,
-            },
-        }
-    );
+    const queryParams = new URLSearchParams(req.query);
+    const lyricsURL = new URL("https://lrclib.net/api/get");
+    lyricsURL.search = queryParams;
+    const fetchLyricRes = await fetch(lyricsURL, {
+        headers: {
+            "User-Agent": `${process.env.npm_package_name} v${process.env.npm_package_version} ${process.env.PROJECT_REPO_URL}`,
+        },
+    });
     if (fetchLyricRes.status == StatusCodes.OK) {
         const fetchedLyrics = await fetchLyricRes.json();
         if (fetchedLyrics.syncedLyrics === null) {
             // Search lyrics again if synced lyrics unavailable from get endpoint
-            const secondSearch = await searchForSynced(queryParams);
+            const secondSearch = await searchLyricsAgain(queryParams, true);
             res.status(StatusCodes.OK).json(
                 secondSearch !== null ? secondSearch : fetchedLyrics
             );
@@ -48,24 +47,37 @@ export async function lyrics(req, res) {
             res.status(StatusCodes.OK).json(fetchedLyrics);
         }
     } else if (fetchLyricRes.status == StatusCodes.NOT_FOUND) {
-        res.status(StatusCodes.NOT_FOUND).end();
+        const secondSearch = await searchLyricsAgain(queryParams, false);
+        if (secondSearch !== null) {
+            res.status(StatusCodes.OK).json(secondSearch);
+        } else {
+            res.status(StatusCodes.NOT_FOUND).end();
+        }
     } else {
         res.status(fetchLyricRes).end();
     }
 }
-async function searchForSynced(queryParams) {
-    const fetchLyricRes = await fetch(
-        `https://lrclib.net/api/search?${queryParams}`,
-        {
-            headers: {
-                "User-Agent": `${process.env.npm_package_name} v${process.env.npm_package_version} ${process.env.PROJECT_REPO_URL}`,
-            },
-        }
-    );
-    const fetchedLyrics = await fetchLyricRes.json();
-    for (let i = 0; i < fetchedLyrics.length; i++) {
-        if (fetchedLyrics[i].syncedLyrics !== null) {
-            return fetchedLyrics[i];
+
+// Second lyric search if lyrics not found or found lyrics were not synced
+async function searchLyricsAgain(queryParams, sync) {
+    queryParams.delete("album_name");
+    const lyricsURL = new URL("https://lrclib.net/api/search");
+    lyricsURL.search = queryParams;
+    const fetchLyricRes = await fetch(lyricsURL, {
+        headers: {
+            "User-Agent": `${process.env.npm_package_name} v${process.env.npm_package_version} ${process.env.PROJECT_REPO_URL}`,
+        },
+    });
+    let resultLyrics;
+    if (fetchLyricRes.status == StatusCodes.OK) {
+        const fetchedLyrics = await fetchLyricRes.json();
+        for (let i = 0; i < fetchedLyrics.length; i++) {
+            if (fetchedLyrics[i].syncedLyrics !== null) {
+                return fetchedLyrics[i];
+            }
+            if (resultLyrics === undefined && !sync) {
+                resultLyrics = fetchedLyrics[i];
+            }
         }
     }
     return null;

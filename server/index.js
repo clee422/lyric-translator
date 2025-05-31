@@ -1,6 +1,7 @@
 import express from "express";
 import session from "express-session";
 import bodyParser from "body-parser";
+import qs from "qs";
 import cors from "cors";
 import dotenv from "dotenv";
 import MongoStore from "connect-mongo";
@@ -13,6 +14,7 @@ dotenv.config();
 const PORT = process.env.PORT;
 const app = express();
 app.set("trust proxy", 1);
+app.set("query parser", (str) => qs.parse(str));
 app.use(
     cors({
         origin: process.env.APP_CLIENT_URL,
