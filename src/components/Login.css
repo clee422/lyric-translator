@@ -47,6 +47,10 @@ a.login-button:hover {
     font-size: 2rem;
 }
 
+.login .github-button svg:hover {
+    color: #cecece;
+}
+
 .login footer span {
     position: fixed;
     color: #ffffff;
