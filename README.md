@@ -100,6 +100,8 @@ GOOGLE_CLIENT_ID="<google-client-id-from-API-setup>"
 GOOGLE_CLIENT_SECRET="<google-client-secret-from-API-setup>"
 ```
 
+Make sure to replace the final 6 variables denoted with `<>`
+
 ### Running the app
 
 1.  Start the app
