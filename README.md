@@ -33,14 +33,14 @@ A Spotify web player that displays translated and romanized song lyrics.
 
 ### API setup
 
-#### _Spotify Project_
+#### _Spotify_
 
 1.  Create a new app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
     -   Add `http://127.0.0.1:10000/auth/spotify/callback` as a **Redirect URI**
     -   Check **_Web API_** and **_Web Playback SDK_** for API/SDKs that are planned to be used
 2.  Take note of the newly created Spotify app's **Client ID** and **Client Secret** for later
 
-#### _Google Project_
+#### _Google_
 
 1.  Create a new project on the [Google Cloud Console](https://console.cloud.google.com/) and select it as the current project
 
