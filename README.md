@@ -31,6 +31,19 @@ A Spotify web player that displays translated and romanized song lyrics.
 
 -   [Node.js](https://nodejs.org/en), runtime environment
 
+### Installation
+
+1.  Clone the repo
+
+    ```
+    git clone https://github.com/clee422/lyric-translator.git
+    ```
+
+2.  Install node dependencies
+    ```
+    npm install
+    ```
+
 ### API setup
 
 #### _Spotify_
@@ -60,19 +73,6 @@ A Spotify web player that displays translated and romanized song lyrics.
     -   Add `http://127.0.0.1:10000/auth/google/callback` as an **Authorized redirect URI**
 
 7.  Take note of the OAuth 2.0 client's **Client ID** and **Client Secret** for later
-
-### Installation
-
-1.  Clone the repo
-
-    ```
-    git clone https://github.com/clee422/lyric-translator.git
-    ```
-
-2.  Install node dependencies
-    ```
-    npm install
-    ```
 
 ### .env file
 
