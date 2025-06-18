@@ -20,6 +20,12 @@ A Spotify web player that displays translated and romanized song lyrics.
 -   Spotify OAuth 2.0
 -   Google OAuth 2.0
 
+### APIs
+
+-   [LRCLIB's API](https://lrclib.net/docs)
+-   [Google Cloud Translation API](https://cloud.google.com/translate/docs/reference/rest)
+-   [Spotify Web API](https://developer.spotify.com/documentation/web-api)
+
 ### Deployment
 
 -   Vercel (client)
