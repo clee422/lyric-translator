@@ -2,7 +2,7 @@
 
 A Spotify web player that displays translated and romanized song lyrics.
 
-**Live Demo:** https://lyric-translator.vercel.app/
+**Video Demo:** [![Demo video](images/demo-trumbnail.png)](https://www.youtube.com/watch?v=ff_-Luy4u7o)
 
 ## Built With
 
@@ -25,11 +25,6 @@ A Spotify web player that displays translated and romanized song lyrics.
 -   [LRCLIB's API](https://lrclib.net/docs)
 -   [Google Cloud Translation API](https://cloud.google.com/translate/docs/reference/rest)
 -   [Spotify Web API](https://developer.spotify.com/documentation/web-api)
-
-### Deployment
-
--   Vercel (client)
--   Render (server)
 
 ## Running the App Locally
 
