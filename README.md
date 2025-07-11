@@ -2,7 +2,7 @@
 
 A Spotify web player that displays translated and romanized song lyrics.
 
-**Video Demo:** [![Demo video](images/demo-trumbnail.png)](https://www.youtube.com/watch?v=ff_-Luy4u7o)
+**Video Demo:** https://www.youtube.com/watch?v=ff_-Luy4u7[![Demo video](images/demo-trumbnail.png)](https://www.youtube.com/watch?v=ff_-Luy4u7o)
 
 ## Built With
 
