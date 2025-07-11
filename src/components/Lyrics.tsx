@@ -327,7 +327,9 @@ export default function Lyrics({
         if (currentTrack) {
             getTrackLyrics(currentTrack).then((lyricsJson) => {
                 parseAndSetLyrics(lyricsJson);
-                translateLyrics(lyricsJson);
+                if (showTranslation || showRomanization) {
+                    translateLyrics(lyricsJson);
+                }
                 setLoading(false);
             });
         }

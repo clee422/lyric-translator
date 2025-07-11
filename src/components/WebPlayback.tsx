@@ -8,8 +8,8 @@ export default function WebPlayback({ token }: { token: string }) {
     const [paused, setPaused] = useState<boolean>();
     const [currentTrack, setCurrentTrack] = useState<Spotify.Track>();
     const [showOriginalLyrics, setShowOriginalLyrics] = useState<boolean>(true);
-    const [showTranslation, setShowTranslation] = useState<boolean>(true);
-    const [showRomanization, setShowRomanization] = useState<boolean>(true);
+    const [showTranslation, setShowTranslation] = useState<boolean>(false);
+    const [showRomanization, setShowRomanization] = useState<boolean>(false);
     const [followLyrics, setFollowLyrics] = useState<boolean>(true);
 
     // Period for playback position updates (in milliseconds)
