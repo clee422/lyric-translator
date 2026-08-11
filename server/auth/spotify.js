@@ -5,11 +5,30 @@ export async function spotifyLogin(req, res) {
         const values = crypto.getRandomValues(new Uint8Array(length));
         return values.reduce(
             (acc, x) => acc + possible[x % possible.length],
-            ""
+            "",
         );
     };
 
-    const state = generateRandomString(16);
+    const codeVerifier = generateRandomString(64);
+
+    const sha256 = async (plain) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(plain);
+        return crypto.subtle.digest("SHA-256", data);
+    };
+
+    const base64encode = (input) => {
+        return btoa(String.fromCharCode(...new Uint8Array(input)))
+            .replace(/=/g, "")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_");
+    };
+
+    const hashed = await sha256(codeVerifier);
+    const codeChallenge = base64encode(hashed);
+
+    req.session.codeVerifier = codeVerifier;
+
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
     const authQueryParams = new URLSearchParams({
@@ -17,7 +36,8 @@ export async function spotifyLogin(req, res) {
         client_id: process.env.SPOTIFY_CLIENT_ID,
         scope: "streaming user-read-email user-read-private",
         redirect_uri: `${process.env.APP_SERVER_URL}/auth/spotify/callback`,
-        state: state,
+        code_challenge_method: "S256",
+        code_challenge: codeChallenge,
     });
 
     authUrl.search = authQueryParams.toString();
@@ -26,36 +46,34 @@ export async function spotifyLogin(req, res) {
 
 export async function spotifyCallback(req, res) {
     const code = req.query.code || null;
-    const state = req.query.state || null;
+    const codeVerifier = req.session.codeVerifier;
 
-    if (state === null) {
-        res.redirect("/");
-    } else {
-        const tokenResponse = await fetch(
-            "https://accounts.spotify.com/api/token",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization: `Basic ${new Buffer.from(
-                        process.env.SPOTIFY_CLIENT_ID +
-                            ":" +
-                            process.env.SPOTIFY_CLIENT_SECRET
-                    ).toString("base64")}`,
-                },
-                body: new URLSearchParams({
-                    code: code,
-                    redirect_uri: `${process.env.APP_SERVER_URL}/auth/spotify/callback`,
-                    grant_type: "authorization_code",
-                }),
-            }
-        );
-        const tokenJson = await tokenResponse.json();
-        req.session.spotifyAccessToken = tokenJson.access_token;
-        req.session.save(() => {
-            res.redirect(`${process.env.APP_CLIENT_URL}/continue-auth`);
-        });
-    }
+    const tokenResponse = await fetch(
+        "https://accounts.spotify.com/api/token",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Basic ${new Buffer.from(
+                    process.env.SPOTIFY_CLIENT_ID +
+                        ":" +
+                        process.env.SPOTIFY_CLIENT_SECRET,
+                ).toString("base64")}`,
+            },
+            body: new URLSearchParams({
+                client_id: process.env.SPOTIFY_CLIENT_ID,
+                redirect_uri: `${process.env.APP_SERVER_URL}/auth/spotify/callback`,
+                grant_type: "authorization_code",
+                code: code,
+                code_verifier: codeVerifier,
+            }),
+        },
+    );
+    const tokenJson = await tokenResponse.json();
+    req.session.spotifyAccessToken = tokenJson.access_token;
+    req.session.save(() => {
+        res.redirect(`${process.env.APP_CLIENT_URL}/continue-auth`);
+    });
 }
 
 export async function spotifyToken(req, res) {
