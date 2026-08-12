@@ -6,7 +6,7 @@ import ContinueOAuth from "./components/ContinueOAuth";
 
 export default function App() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
-        undefined
+        undefined,
     );
     const [googleTokenAcquired, setGoogleTokenAcquired] =
         useState<boolean>(false);
@@ -18,7 +18,7 @@ export default function App() {
                 {
                     method: "GET",
                     credentials: "include",
-                }
+                },
             );
             const spotifyJson = await spotifyRes.json();
             setSpotifyToken(spotifyJson.access_token);
@@ -27,7 +27,7 @@ export default function App() {
                 {
                     method: "GET",
                     credentials: "include",
-                }
+                },
             );
             const googleJson = await googleRes.json();
             setGoogleTokenAcquired(googleJson.tokenAcquired);
@@ -52,6 +52,18 @@ export default function App() {
                     }
                 />
                 <Route path="/continue-auth" element={<ContinueOAuth />} />
+                <Route
+                    path="/player"
+                    element={
+                        <main className="app">
+                            {spotifyToken !== undefined ? (
+                                <WebPlayback token={spotifyToken} />
+                            ) : (
+                                ""
+                            )}
+                        </main>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );
