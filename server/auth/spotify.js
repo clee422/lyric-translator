@@ -27,7 +27,7 @@ export async function spotifyLogin(req, res) {
     const hashed = await sha256(codeVerifier);
     const codeChallenge = base64encode(hashed);
 
-    req.session.codeVerifier = codeVerifier;
+    req.session.spotifyCodeVerifier = codeVerifier;
 
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
@@ -46,7 +46,7 @@ export async function spotifyLogin(req, res) {
 
 export async function spotifyCallback(req, res) {
     const code = req.query.code || null;
-    const codeVerifier = req.session.codeVerifier;
+    const codeVerifier = req.session.spotifyCodeVerifier;
 
     const tokenResponse = await fetch(
         "https://accounts.spotify.com/api/token",
