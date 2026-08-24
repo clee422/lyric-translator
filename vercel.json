@@ -1,9 +1,9 @@
 {
     "rewrites": [
-        { "source": "/(.*)", "destination": "/" },
         {
             "source": "/api/:path*",
             "destination": "https://lyric-translator-server.onrender.com/:path*"
-        }
+        },
+        { "source": "/(.*)", "destination": "/" }
     ]
 }
