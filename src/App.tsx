@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
 import ContinueOAuth from "./components/ContinueOAuth";
+import TokenMissing from "./components/TokenMissing";
 
 export default function App() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
@@ -59,7 +60,7 @@ export default function App() {
                             {spotifyToken !== undefined ? (
                                 <WebPlayback token={spotifyToken} />
                             ) : (
-                                ""
+                                <TokenMissing token={spotifyToken} />
                             )}
                         </main>
                     }
