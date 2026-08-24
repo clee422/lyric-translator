@@ -3,6 +3,7 @@
 }
 
 body {
+    color: white;
     margin: 0;
     font-family: "Inter", sans-serif;
     background-color: var(--app-background-color);

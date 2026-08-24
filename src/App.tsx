@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
 import ContinueOAuth from "./components/ContinueOAuth";
 import TokenMissing from "./components/TokenMissing";
+import Ping from "./components/Ping";
 
 export default function App() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
@@ -70,6 +71,14 @@ export default function App() {
                     element={
                         <main className="app">
                             <TokenMissing />
+                        </main>
+                    }
+                />
+                <Route
+                    path="/ping"
+                    element={
+                        <main className="app">
+                            <Ping />
                         </main>
                     }
                 />

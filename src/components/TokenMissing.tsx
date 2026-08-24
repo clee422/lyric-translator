@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./TokenMissing.css";
 
 export default function TokenMissing() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>();

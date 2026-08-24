@@ -8,6 +8,7 @@ import MongoStore from "connect-mongo";
 import { lyrics, translate } from "./song.js";
 import { spotifyLogin, spotifyCallback, spotifyToken } from "./auth/spotify.js";
 import { googleCallback, googleLogin, googleToken } from "./auth/google.js";
+import { StatusCodes } from "http-status-codes";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use(
     cors({
         origin: process.env.APP_CLIENT_URL,
         credentials: true,
-    })
+    }),
 );
 app.use(
     session({
@@ -37,7 +38,7 @@ app.use(
             secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
             maxAge: 3600000, // 1 hour
         },
-    })
+    }),
 );
 app.use(bodyParser.json());
 
@@ -58,8 +59,13 @@ app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
 
+app.get("/ping", async function pong(req, res) {
+    console.log("Ping received");
+    res.status(StatusCodes.OK).send("Pong");
+});
+
 app.listen(PORT, () => {
     console.log(
-        `Server started at ${process.env.APP_SERVER_URL} on port ${PORT}`
+        `Server started at ${process.env.APP_SERVER_URL} on port ${PORT}`,
     );
 });
