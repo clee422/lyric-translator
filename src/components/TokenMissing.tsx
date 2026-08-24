@@ -14,27 +14,7 @@ export default function TokenMissing() {
         //         },
         //     );
 
-        //     console.log("bodyUsed before reading: ", spotifyRes.bodyUsed);
-
-        //     console.log("STATUS: ", spotifyRes.status);
-        //     console.log(
-        //         "CONTENT-TYPE: ",
-        //         spotifyRes.headers.get("content-type"),
-        //     );
-
-        //     const text = await spotifyRes.text();
-        //     console.log("RAW RESPONSE:", text);
-
-        //     console.log("bodyUsed after reading: ", spotifyRes.bodyUsed);
-
-        //     const data = JSON.parse(text);
-
-        //     console.log("PARSED DATA:", data);
-        //     console.log("KEYS:", Object.keys(data));
-
         //     // const spotifyJson = await spotifyRes.json();
-        //     // console.log("DATA: ", spotifyJson);
-        //     // console.log(`TOKEN: ${spotifyJson.access_token}`);
         //     // setSpotifyToken(spotifyJson.access_token);
         // }
         async function getToken() {
@@ -55,6 +35,18 @@ export default function TokenMissing() {
 
             console.log("RAW:", raw);
             console.log("BODY USED:", response.bodyUsed);
+
+            const debug = {
+                status: response.status,
+                responseUrl: response.url,
+                rawResponse: raw,
+            };
+
+            document.body.innerHTML += `<pre>${JSON.stringify(
+                debug,
+                null,
+                2,
+            )}</pre>`;
 
             const data = JSON.parse(raw);
 
