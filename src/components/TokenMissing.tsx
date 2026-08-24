@@ -13,10 +13,25 @@ export default function TokenMissing({ token }: { token: string | undefined }) {
                     credentials: "include",
                 },
             );
-            const spotifyJson = await spotifyRes.json();
-            console.log("DATA: ", spotifyJson);
-            console.log(`TOKEN: ${spotifyJson.access_token}`);
-            setSpotifyToken(spotifyJson.access_token);
+
+            console.log("STATUS: ", spotifyRes.status);
+            console.log(
+                "CONTENT-TYPE: ",
+                spotifyRes.headers.get("content-type"),
+            );
+
+            const text = await spotifyRes.text();
+            console.log("RAW RESPONSE:", text);
+
+            const data = JSON.parse(text);
+
+            console.log("PARSED DATA:", data);
+            console.log("KEYS:", Object.keys(data));
+
+            // const spotifyJson = await spotifyRes.json();
+            // console.log("DATA: ", spotifyJson);
+            // console.log(`TOKEN: ${spotifyJson.access_token}`);
+            // setSpotifyToken(spotifyJson.access_token);
         }
         getToken();
     }, []);
