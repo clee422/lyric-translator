@@ -60,7 +60,7 @@ app.get("/song/lyrics", lyrics);
 app.post("/song/translate", translate);
 
 app.get("/ping", async function pong(req, res) {
-    console.log("Ping received");
+    console.log("Ping received from ", req.sessionID);
     res.status(StatusCodes.OK).send("Pong");
 });
 
