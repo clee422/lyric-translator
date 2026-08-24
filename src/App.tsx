@@ -65,6 +65,14 @@ export default function App() {
                         </main>
                     }
                 />
+                <Route
+                    path="/token"
+                    element={
+                        <main className="app">
+                            <TokenMissing token={spotifyToken} />
+                        </main>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );
