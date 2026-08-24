@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
 import ContinueOAuth from "./components/ContinueOAuth";
-import TokenMissing from "./components/TokenMissing";
 import DebugSession from "./components/DebugSession";
 
 export default function App() {
@@ -48,26 +47,6 @@ export default function App() {
                     }
                 />
                 <Route path="/continue-auth" element={<ContinueOAuth />} />
-                <Route
-                    path="/player"
-                    element={
-                        <main className="app">
-                            {spotifyToken !== undefined ? (
-                                <WebPlayback token={spotifyToken} />
-                            ) : (
-                                <TokenMissing />
-                            )}
-                        </main>
-                    }
-                />
-                <Route
-                    path="/token"
-                    element={
-                        <main className="app">
-                            <TokenMissing />
-                        </main>
-                    }
-                />
                 <Route
                     path="/debug-session"
                     element={
