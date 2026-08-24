@@ -17,9 +17,7 @@ export default function TokenMissing() {
         //     // setSpotifyToken(spotifyJson.access_token);
         // }
         async function getToken() {
-            const url = `${
-                import.meta.env.VITE_APP_SERVER_URL
-            }/auth/spotify/token`;
+            const url = `/api/auth/spotify/token`;
 
             const response = await fetch(url, {
                 method: "GET",

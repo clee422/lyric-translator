@@ -5,12 +5,7 @@ export default function Login() {
     return (
         <div className="login">
             <h1>lyric translator</h1>
-            <a
-                className="login-button"
-                href={`${
-                    import.meta.env.VITE_APP_SERVER_URL
-                }/auth/spotify/login`}
-            >
+            <a className="login-button" href={`/api/auth/spotify/login`}>
                 Login
             </a>
             <footer>
