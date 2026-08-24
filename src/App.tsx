@@ -60,7 +60,7 @@ export default function App() {
                             {spotifyToken !== undefined ? (
                                 <WebPlayback token={spotifyToken} />
                             ) : (
-                                <TokenMissing token={spotifyToken} />
+                                <TokenMissing />
                             )}
                         </main>
                     }
