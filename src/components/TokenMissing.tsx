@@ -28,10 +28,10 @@ export default function TokenMissing({ token }: { token: string | undefined }) {
             console.log("PARSED DATA:", data);
             console.log("KEYS:", Object.keys(data));
 
-            // const spotifyJson = await spotifyRes.json();
+            const spotifyJson = await spotifyRes.json();
             // console.log("DATA: ", spotifyJson);
             // console.log(`TOKEN: ${spotifyJson.access_token}`);
-            // setSpotifyToken(spotifyJson.access_token);
+            setSpotifyToken(spotifyJson.access_token);
         }
         getToken();
     }, []);
