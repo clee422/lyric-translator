@@ -76,7 +76,7 @@ export default function PlaybackControl({
                 "&:hover": {
                     backgroundColor: alpha(
                         thumbColor,
-                        theme.palette.action.hoverOpacity
+                        theme.palette.action.hoverOpacity,
                     ),
                 },
             },
@@ -103,20 +103,17 @@ export default function PlaybackControl({
         if (!trackName) {
             return;
         }
-        const translationRes = await fetch(
-            `${import.meta.env.VITE_APP_SERVER_URL}/song/translate`,
-            {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    content: [trackName],
-                    targetLanguage: targetLanguage,
-                }),
-            }
-        );
+        const translationRes = await fetch(`/api/song/translate`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: [trackName],
+                targetLanguage: targetLanguage,
+            }),
+        });
         if (translationRes.status == StatusCodes.OK) {
             translationRes.json().then((json) => {
                 const [translatedContent] = json.translatedContent;
@@ -126,7 +123,7 @@ export default function PlaybackControl({
             });
         } else {
             console.error(
-                `Attempted to translate track info, response was status ${translationRes.status}`
+                `Attempted to translate track info, response was status ${translationRes.status}`,
             );
         }
     }
@@ -138,7 +135,7 @@ export default function PlaybackControl({
     }
 
     function handleClickTranslationMenu(
-        event: React.MouseEvent<HTMLButtonElement>
+        event: React.MouseEvent<HTMLButtonElement>,
     ) {
         setAnchorElem(event.currentTarget);
     }

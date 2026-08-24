@@ -46,34 +46,29 @@ export default function Lyrics({
     const currentLineRef = useRef<null | HTMLDivElement>(null);
 
     async function getTrackLyrics(
-        stateCurrentTrack: Spotify.Track
+        stateCurrentTrack: Spotify.Track,
     ): Promise<any> {
         const queryParams = new URLSearchParams({
             track_name: stateCurrentTrack.name,
             artist_name: stateCurrentTrack.artists[0].name,
             album_name: stateCurrentTrack.album.name,
             duration: Math.floor(
-                stateCurrentTrack.duration_ms / 1000
+                stateCurrentTrack.duration_ms / 1000,
             ).toString(),
         });
 
         try {
-            return fetch(
-                `${
-                    import.meta.env.VITE_APP_SERVER_URL
-                }/song/lyrics?${queryParams}`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                }
-            ).then((res) => {
+            return fetch(`/api/song/lyrics?${queryParams}`, {
+                method: "GET",
+                credentials: "include",
+            }).then((res) => {
                 if (res.status == StatusCodes.OK) {
                     return res.json();
                 } else if (res.status == StatusCodes.NOT_FOUND) {
                     return undefined;
                 } else {
                     console.error(
-                        `Attempted to fetch lyrics, response was status ${res.status}`
+                        `Attempted to fetch lyrics, response was status ${res.status}`,
                     );
                     return undefined;
                 }
@@ -98,7 +93,7 @@ export default function Lyrics({
             const synced: string[] = lyricsJson.syncedLyrics
                 .split("\n")
                 .filter((line: string) =>
-                    /\[\d{2}:\d{2}.\d{2}\]\s*.+/.test(line)
+                    /\[\d{2}:\d{2}.\d{2}\]\s*.+/.test(line),
                 );
 
             // Use plain lyrics to determine linebreak for new verse
@@ -121,7 +116,7 @@ export default function Lyrics({
                     };
                 }
                 const parts = /\[(\d{2}):(\d{2}).(\d{2})\]\s*(.+)/.exec(
-                    synced[syncedLyricsIndex]
+                    synced[syncedLyricsIndex],
                 );
                 syncedLyricsIndex += 1;
                 if (!parts) {
@@ -144,7 +139,7 @@ export default function Lyrics({
                 };
             });
             newLyrics = newLyrics.filter((line) =>
-                line.invalid ? false : true
+                line.invalid ? false : true,
             );
             setLyrics(newLyrics);
             setLyricSync(true);
@@ -154,7 +149,7 @@ export default function Lyrics({
                 split.map((line) => ({
                     timestamp: undefined,
                     lyric: line,
-                }))
+                })),
             );
             setLyricSync(false);
         } else {
@@ -173,7 +168,7 @@ export default function Lyrics({
         const lyrics: string[] = lyricsJson.plainLyrics
             .split("\n")
             .filter((line: string) => line !== "");
-        fetch(`${import.meta.env.VITE_APP_SERVER_URL}/song/translate`, {
+        fetch(`/api/song/translate`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -187,11 +182,11 @@ export default function Lyrics({
             .then((res) => {
                 if (res.status == StatusCodes.OK) {
                     res.json().then((json) =>
-                        setTranslation(json.translatedContent)
+                        setTranslation(json.translatedContent),
                     );
                 } else {
                     console.error(
-                        `Attempted to translate lyrics, response was status ${res.status}`
+                        `Attempted to translate lyrics, response was status ${res.status}`,
                     );
                 }
             })
@@ -372,7 +367,7 @@ export default function Lyrics({
         }
         if (showOriginalLyrics) {
             lyrics?.forEach(
-                (line) => (maxChars = Math.max(maxChars, line.lyric.length))
+                (line) => (maxChars = Math.max(maxChars, line.lyric.length)),
             );
         }
         setLyricsWidth(maxChars * 0.65);

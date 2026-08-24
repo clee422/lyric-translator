@@ -6,7 +6,7 @@ export default function TokenMissing() {
     useEffect(() => {
         // async function getToken() {
         //     const spotifyRes = await fetch(
-        //         `${import.meta.env.VITE_APP_SERVER_URL}/auth/spotify/token`,
+        //         `/api/auth/spotify/token`,
         //         {
         //             method: "GET",
         //             credentials: "include",
