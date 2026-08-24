@@ -1,9 +1,8 @@
-// import { useState, useEffect } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./TokenMissing.css";
 
 export default function TokenMissing() {
-    // const [spotifyToken, setSpotifyToken] = useState<string | undefined>(token);
+    const [spotifyToken, setSpotifyToken] = useState<string | undefined>();
 
     useEffect(() => {
         // async function getToken() {
@@ -62,7 +61,7 @@ export default function TokenMissing() {
             console.log("DATA:", data);
             console.log("TOKEN:", data.access_token);
 
-            // setSpotifyToken(data.access_token);
+            setSpotifyToken(data.access_token);
         }
         getToken();
     }, []);
@@ -71,7 +70,7 @@ export default function TokenMissing() {
         <div className="token-missing">
             <span>Missing Spotify OAuth Token</span>
             <br />
-            {/* <span>{`${spotifyToken}`}</span> */}
+            <span>{`${spotifyToken}`}</span>
         </div>
     );
 }
