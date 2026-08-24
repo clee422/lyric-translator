@@ -35,7 +35,7 @@ export async function spotifyLogin(req, res) {
         response_type: "code",
         client_id: process.env.SPOTIFY_CLIENT_ID,
         scope: "streaming user-read-email user-read-private",
-        redirect_uri: `${process.env.APP_SERVER_URL}/auth/spotify/callback`,
+        redirect_uri: `${process.env.APP_CLIENT_URL}/api/auth/spotify/callback`,
         code_challenge_method: "S256",
         code_challenge: codeChallenge,
     });
@@ -62,7 +62,7 @@ export async function spotifyCallback(req, res) {
             },
             body: new URLSearchParams({
                 client_id: process.env.SPOTIFY_CLIENT_ID,
-                redirect_uri: `${process.env.APP_SERVER_URL}/auth/spotify/callback`,
+                redirect_uri: `${process.env.APP_CLIENT_URL}/api/auth/spotify/callback`,
                 grant_type: "authorization_code",
                 code: code,
                 code_verifier: codeVerifier,

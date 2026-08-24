@@ -37,7 +37,7 @@ export async function googleLogin(req, res) {
         scope: "https://www.googleapis.com/auth/cloud-translation",
         response_type: "code",
         client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: `${process.env.APP_SERVER_URL}/auth/google/callback`,
+        redirect_uri: `${process.env.APP_CLIENT_URL}/api/auth/google/callback`,
         code_challenge_method: "S256",
         code_challenge: codeChallenge,
         // state: state,
@@ -61,7 +61,7 @@ export async function googleCallback(req, res) {
             ).toString("base64")}`,
         },
         body: new URLSearchParams({
-            redirect_uri: `${process.env.APP_SERVER_URL}/auth/google/callback`,
+            redirect_uri: `${process.env.APP_CLIENT_URL}/api/auth/google/callback`,
             grant_type: "authorization_code",
             code: code,
             code_verifier: codeVerifier,
