@@ -69,7 +69,7 @@ export default function App() {
                     path="/token"
                     element={
                         <main className="app">
-                            <TokenMissing token={spotifyToken} />
+                            <TokenMissing />
                         </main>
                     }
                 />
