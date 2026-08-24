@@ -4,7 +4,7 @@ import Login from "./components/Login";
 import WebPlayback from "./components/WebPlayback";
 import ContinueOAuth from "./components/ContinueOAuth";
 import TokenMissing from "./components/TokenMissing";
-import Ping from "./components/Ping";
+import DebugSession from "./components/DebugSession";
 
 export default function App() {
     const [spotifyToken, setSpotifyToken] = useState<string | undefined>(
@@ -75,10 +75,10 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/ping"
+                    path="/debug-session"
                     element={
                         <main className="app">
-                            <Ping />
+                            <DebugSession />
                         </main>
                     }
                 />

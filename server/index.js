@@ -59,9 +59,18 @@ app.get("/song/lyrics", lyrics);
 
 app.post("/song/translate", translate);
 
-app.get("/ping", async function pong(req, res) {
-    console.log("Ping received from ", req.sessionID);
-    res.status(StatusCodes.OK).send("Pong");
+app.get("/debug-session", (req, res) => {
+    console.log("Session ID:", req.sessionID);
+    console.log("Cookie:", req.headers.cookie);
+    console.log("Session:", req.session);
+
+    req.session.test = "hello";
+
+    res.json({
+        sessionID: req.sessionID,
+        hasCookie: !!req.headers.cookie,
+        test: req.session.test,
+    });
 });
 
 app.listen(PORT, () => {
