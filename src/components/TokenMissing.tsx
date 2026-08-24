@@ -14,6 +14,8 @@ export default function TokenMissing({ token }: { token: string | undefined }) {
                 },
             );
             const spotifyJson = await spotifyRes.json();
+            console.log(`DATA: ${spotifyJson}`);
+            console.log(`TOKEN: ${spotifyJson.access_token}`);
             setSpotifyToken(spotifyJson.access_token);
         }
         getToken();
