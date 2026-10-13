@@ -185,10 +185,25 @@ export default function PlaybackControl({
             {isMobile ? (
                 <header className="app-header">
                     <div className="current-track-info-mobile">
-                        <span className="current-track-name">
-                            Dear my crazy soul mate
+                        {currentTrack?.name ? (
+                            <span
+                                className={`current-track-name${
+                                    trackNameTranslation !== undefined
+                                        ? " translate-track-name"
+                                        : ""
+                                }`}
+                                onClick={handleToggleTrackName}
+                            >
+                                {translateTrackName && trackNameTranslation
+                                    ? trackNameTranslation
+                                    : currentTrack.name}
+                            </span>
+                        ) : null}
+                        <span className="current-track-artist">
+                            {currentTrack?.artists
+                                .map((artist) => artist.name)
+                                .join(", ")}
                         </span>
-                        <span className="current-track-artist">IU</span>
                     </div>
                 </header>
             ) : null}
