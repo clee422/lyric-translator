@@ -4,7 +4,8 @@ import "./Login.css";
 export default function Login() {
     return (
         <div className="login">
-            <h1>lyric translator</h1>
+            <h1>musetta</h1>
+            <h2>the lyric translator</h2>
             <a className="login-button" href={`/api/auth/spotify/login`}>
                 Login
             </a>
