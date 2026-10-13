@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StatusCodes } from "http-status-codes";
+import { isMobile } from "react-device-detect";
 import "./PlaybackControl.css";
 
 export default function PlaybackControl({
@@ -180,228 +181,257 @@ export default function PlaybackControl({
     });
 
     return (
-        <footer className="app-footer">
-            <Slider
-                className="playback-seeker"
-                size="small"
-                value={position}
-                min={0}
-                max={trackDuration}
-                step={1000}
-                sx={(t) => ({
-                    color: "rgb(200, 200, 200)",
-                    "& .MuiSlider-thumb": {
-                        width: 0,
-                        height: 0,
-                        transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
-                        "&:hover, &.Mui-focusVisible": {
-                            boxShadow: `0px 0px 0px 8px ${"rgb(0 0 0 / 16%)"}`,
-                            ...t.applyStyles("dark", {
-                                boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
-                            }),
-                            width: 8,
-                            height: 8,
-                        },
-                        "&.Mui-active": {
-                            width: 12,
-                            height: 12,
-                        },
-                    },
-                })}
-                onChange={(_, value) => {
-                    webPlayer?.seek(value);
-                }}
-                valueLabelDisplay="auto"
-                valueLabelFormat={formatTimestamp}
-            />
-            <div className="playback-control">
-                <div className="current-track">
-                    {currentTrack?.album.images[0].url ? (
-                        <img
-                            src={currentTrack.album.images[0].url}
-                            className="current-track-cover"
-                            alt=""
-                        />
-                    ) : null}
-                    <div className="current-track-info">
-                        {currentTrack?.name ? (
-                            <span
-                                className={`current-track-name${
-                                    trackNameTranslation !== undefined
-                                        ? " translate-track-name"
-                                        : ""
-                                }`}
-                                onClick={handleToggleTrackName}
-                            >
-                                {translateTrackName && trackNameTranslation
-                                    ? trackNameTranslation
-                                    : currentTrack.name + "\n"}
-                            </span>
-                        ) : null}
-                        <span className="current-track-artist">
-                            {currentTrack?.artists
-                                .map((artist) => artist.name)
-                                .join(", ")}
+        <div className="playback-control">
+            {isMobile ? (
+                <header className="app-header">
+                    <div className="current-track-info-mobile">
+                        <span className="current-track-name">
+                            Dear my crazy soul mate
                         </span>
+                        <span className="current-track-artist">IU</span>
                     </div>
-                </div>
-                <div className="playback-control-buttons">
-                    <button
-                        className="playback-control-change-track"
-                        onClick={() => {
-                            if (position > 2000) {
-                                webPlayer?.seek(0);
-                            } else {
-                                webPlayer?.previousTrack();
-                            }
-                        }}
-                    >
-                        <SkipPrevious />
-                    </button>
-                    <button
-                        className="playback-control-toggle-play"
-                        onClick={() => {
-                            webPlayer?.togglePlay();
-                        }}
-                    >
-                        {paused ? <PlayCircle /> : <PauseCircle />}
-                    </button>
-                    <button
-                        className="playback-control-change-track"
-                        onClick={() => {
-                            webPlayer?.nextTrack();
-                        }}
-                    >
-                        <SkipNext />
-                    </button>
-                </div>
-                <div className="playback-features">
-                    <div className="toggle-follow-lyrics">
-                        <Tooltip
-                            title={
-                                followLyrics
-                                    ? "Stop following lyrics"
-                                    : "Follow lyrics"
-                            }
+                </header>
+            ) : null}
+            <footer className="app-footer">
+                <Slider
+                    className="playback-seeker"
+                    size="small"
+                    value={position}
+                    min={0}
+                    max={trackDuration}
+                    step={1000}
+                    sx={(t) => ({
+                        color: "rgb(200, 200, 200)",
+                        "& .MuiSlider-thumb": {
+                            width: 0,
+                            height: 0,
+                            transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                            "&:hover, &.Mui-focusVisible": {
+                                boxShadow: `0px 0px 0px 8px ${"rgb(0 0 0 / 16%)"}`,
+                                ...t.applyStyles("dark", {
+                                    boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
+                                }),
+                                width: 8,
+                                height: 8,
+                            },
+                            "&.Mui-active": {
+                                width: 12,
+                                height: 12,
+                            },
+                        },
+                    })}
+                    onChange={(_, value) => {
+                        webPlayer?.seek(value);
+                    }}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={formatTimestamp}
+                />
+                <div className="playback-control">
+                    {!isMobile ? (
+                        <div className="current-track">
+                            {currentTrack?.album.images[0].url ? (
+                                <img
+                                    src={currentTrack.album.images[0].url}
+                                    className="current-track-cover"
+                                    alt=""
+                                />
+                            ) : null}
+                            <div className="current-track-info">
+                                {currentTrack?.name ? (
+                                    <span
+                                        className={`current-track-name${
+                                            trackNameTranslation !== undefined
+                                                ? " translate-track-name"
+                                                : ""
+                                        }`}
+                                        onClick={handleToggleTrackName}
+                                    >
+                                        {translateTrackName &&
+                                        trackNameTranslation
+                                            ? trackNameTranslation
+                                            : currentTrack.name + "\n"}
+                                    </span>
+                                ) : null}
+                                <span className="current-track-artist">
+                                    {currentTrack?.artists
+                                        .map((artist) => artist.name)
+                                        .join(", ")}
+                                </span>
+                            </div>
+                        </div>
+                    ) : null}
+                    <div className="playback-control-buttons">
+                        <button
+                            className="playback-control-change-track"
+                            onClick={() => {
+                                if (position > 2000) {
+                                    webPlayer?.seek(0);
+                                } else {
+                                    webPlayer?.previousTrack();
+                                }
+                            }}
                         >
-                            <IconButton onClick={onToggleFollowLyrics}>
-                                {followLyrics ? <SearchOff /> : <Search />}
-                            </IconButton>
-                        </Tooltip>
+                            <SkipPrevious />
+                        </button>
+                        <button
+                            className="playback-control-toggle-play"
+                            onClick={() => {
+                                webPlayer?.togglePlay();
+                            }}
+                        >
+                            {paused ? <PlayCircle /> : <PauseCircle />}
+                        </button>
+                        <button
+                            className="playback-control-change-track"
+                            onClick={() => {
+                                webPlayer?.nextTrack();
+                            }}
+                        >
+                            <SkipNext />
+                        </button>
                     </div>
-                    <div className="toggle-translate">
-                        <Tooltip title="Translate">
-                            <IconButton onClick={handleClickTranslationMenu}>
-                                <Translate />
-                            </IconButton>
-                        </Tooltip>
+                    <div className="playback-features">
+                        <div className="toggle-follow-lyrics">
+                            <Tooltip
+                                title={
+                                    followLyrics
+                                        ? "Stop following lyrics"
+                                        : "Follow lyrics"
+                                }
+                            >
+                                <IconButton onClick={onToggleFollowLyrics}>
+                                    {followLyrics ? <SearchOff /> : <Search />}
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+                        <div className="toggle-translate">
+                            <Tooltip title="Translate">
+                                <IconButton
+                                    onClick={handleClickTranslationMenu}
+                                >
+                                    <Translate />
+                                </IconButton>
+                            </Tooltip>
 
-                        <Menu
-                            anchorOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            transformOrigin={{
-                                vertical: "bottom",
-                                horizontal: "center",
-                            }}
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleCloseTranslationMenu}
-                            sx={{
-                                ".MuiPaper-root": {
-                                    color: "white",
-                                    backgroundColor: "#1E1E1E",
-                                },
-                                ".MuiMenuItem-root:hover": {
-                                    backgroundColor: "#2D2D2D",
-                                },
-                                ".MuiFormControlLabel-label": {
-                                    fontFamily: `"Inter", sans-serif`,
-                                    fontWeight: "300",
-                                    marginLeft: "0.5rem",
-                                },
-                            }}
-                        >
-                            <FormGroup>
-                                <MenuItem>
-                                    <FormControlLabel
-                                        control={
-                                            <LyricSwitch
-                                                checked={showOriginalLyrics}
-                                                onChange={
-                                                    onToggleOriginalLyrics
-                                                }
-                                                color="default"
-                                            />
-                                        }
-                                        label="Original Lyrics"
-                                    />
-                                </MenuItem>
-                                <MenuItem>
-                                    <FormControlLabel
-                                        control={
-                                            <LyricSwitch
-                                                checked={showTranslation}
-                                                onChange={onToggleTranslation}
-                                            />
-                                        }
-                                        label="Translation"
-                                    />
-                                </MenuItem>
-                                <MenuItem>
-                                    <FormControlLabel
-                                        control={
-                                            <LyricSwitch
-                                                checked={showRomanization}
-                                                onChange={onToggleRomanization}
-                                            />
-                                        }
-                                        label="Romanization"
-                                    />
-                                </MenuItem>
-                            </FormGroup>
-                        </Menu>
-                    </div>
-                    <div className="playback-volume-control">
-                        <Tooltip title={volume === 0 ? "Unmute" : "Mute"}>
-                            <IconButton onClick={handleToggleMute}>
-                                {volume === 0 ? <VolumeOff /> : <VolumeUp />}
-                            </IconButton>
-                        </Tooltip>
-                        <Slider
-                            size="small"
-                            value={volume}
-                            min={0}
-                            max={100}
-                            step={1}
-                            sx={() => ({
-                                color: "rgb(200, 200, 200)",
-                                "& .MuiSlider-thumb": {
-                                    width: 0,
-                                    height: 0,
-                                    transition:
-                                        "0.3s cubic-bezier(.47,1.64,.41,.8)",
-                                    "&:hover, &.Mui-focusVisible": {
-                                        boxShadow: "none",
-                                        width: 8,
-                                        height: 8,
+                            <Menu
+                                anchorOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                transformOrigin={{
+                                    vertical: "bottom",
+                                    horizontal: "center",
+                                }}
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleCloseTranslationMenu}
+                                sx={{
+                                    ".MuiPaper-root": {
+                                        color: "white",
+                                        backgroundColor: "#1E1E1E",
                                     },
-                                    "&.Mui-active": {
-                                        width: 12,
-                                        height: 12,
+                                    ".MuiMenuItem-root:hover": {
+                                        backgroundColor: "#2D2D2D",
                                     },
-                                },
-                            })}
-                            onChange={(_, value) => {
-                                webPlayer?.setVolume(value / 100);
-                                setVolume(value);
-                            }}
-                            valueLabelDisplay="auto"
-                        />
+                                    ".MuiFormControlLabel-label": {
+                                        fontFamily: `"Inter", sans-serif`,
+                                        fontWeight: "300",
+                                        marginLeft: "0.5rem",
+                                    },
+                                }}
+                            >
+                                <FormGroup>
+                                    <MenuItem>
+                                        <FormControlLabel
+                                            control={
+                                                <LyricSwitch
+                                                    checked={showOriginalLyrics}
+                                                    onChange={
+                                                        onToggleOriginalLyrics
+                                                    }
+                                                    color="default"
+                                                />
+                                            }
+                                            label="Original Lyrics"
+                                        />
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <FormControlLabel
+                                            control={
+                                                <LyricSwitch
+                                                    checked={showTranslation}
+                                                    onChange={
+                                                        onToggleTranslation
+                                                    }
+                                                />
+                                            }
+                                            label="Translation"
+                                        />
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <FormControlLabel
+                                            control={
+                                                <LyricSwitch
+                                                    checked={showRomanization}
+                                                    onChange={
+                                                        onToggleRomanization
+                                                    }
+                                                />
+                                            }
+                                            label="Romanization"
+                                        />
+                                    </MenuItem>
+                                </FormGroup>
+                            </Menu>
+                        </div>
+                        {!isMobile ? (
+                            <div className="playback-volume-control">
+                                <Tooltip
+                                    title={volume === 0 ? "Unmute" : "Mute"}
+                                >
+                                    <IconButton onClick={handleToggleMute}>
+                                        {volume === 0 ? (
+                                            <VolumeOff />
+                                        ) : (
+                                            <VolumeUp />
+                                        )}
+                                    </IconButton>
+                                </Tooltip>
+                                <Slider
+                                    size="small"
+                                    value={volume}
+                                    min={0}
+                                    max={100}
+                                    step={1}
+                                    sx={() => ({
+                                        color: "rgb(200, 200, 200)",
+                                        "& .MuiSlider-thumb": {
+                                            width: 0,
+                                            height: 0,
+                                            transition:
+                                                "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                                            "&:hover, &.Mui-focusVisible": {
+                                                boxShadow: "none",
+                                                width: 8,
+                                                height: 8,
+                                            },
+                                            "&.Mui-active": {
+                                                width: 12,
+                                                height: 12,
+                                            },
+                                        },
+                                    })}
+                                    onChange={(_, value) => {
+                                        webPlayer?.setVolume(value / 100);
+                                        setVolume(value);
+                                    }}
+                                    valueLabelDisplay="auto"
+                                />
+                            </div>
+                        ) : null}
                     </div>
                 </div>
-            </div>
-        </footer>
+            </footer>
+        </div>
     );
 }
