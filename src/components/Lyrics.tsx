@@ -2,6 +2,7 @@ import { clsx } from "clsx";
 import { StatusCodes } from "http-status-codes";
 import { CircularProgress } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
+import { isMobile } from "react-device-detect";
 import "./Lyrics.css";
 
 export interface LyricLine {
@@ -395,6 +396,7 @@ export default function Lyrics({
                     className="lyrics"
                     style={{
                         width: lyricSync ? `${lyricsWidth}rem` : "fit-content",
+                        marginTop: isMobile ? "15vh" : "5vh",
                     }}
                 >
                     {renderLyrics()}
