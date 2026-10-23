@@ -396,7 +396,7 @@ export default function Lyrics({
                     className="lyrics"
                     style={{
                         width: lyricSync ? `${lyricsWidth}rem` : "fit-content",
-                        marginTop: isMobile ? "15vh" : "5vh",
+                        marginTop: isMobile ? "12vh" : "5vh",
                     }}
                 >
                     {renderLyrics()}
